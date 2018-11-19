@@ -1,7 +1,7 @@
 ---
 title: "Kane Thesis - Regional Imputation"
 author: "Zachary Kane"
-date: "18 September 2018"
+date: "06 Oct 2018"
 output:
   pdf_document: default
   html_document: default
@@ -14,54 +14,42 @@ knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 ### Import Data into R
 
 ```{r}
-ten_year_data <- read.csv("~/Thesis/ten_year_data.csv")
+ten_year_data <- read.csv("~/Thesis/finalll_ten_year.csv")
 ten_year_data <- ten_year_data[,-1]
-#clean up polity
-#ten_year_data$Polity.IV[ten_year_data$Polity.IV == -66|ten_year_data$Polity.IV == -77
-#                        |ten_year_data$Polity.IV == -88] <- 0
-ten_year_data$Polity.IV[ten_year_data$Regime.Type == "Central ruler/ruling party" & 
-                          is.na(ten_year_data$Polity.IV)] <- -10
-ten_year_data$Polity.IV[ten_year_data$Regime.Type == "Democratic" & 
-                          is.na(ten_year_data$Polity.IV)] <- 10
-ten_year_data$Polity.IV[ten_year_data$Regime.Type == "Emerging, transitional, recent change, Disputed" & 
-                         is.na(ten_year_data$Polity.IV)] <- 0
-attach(ten_year_data)
-Government.0 <- ifelse((Polity.IV <= -6) & (Polity.IV >= -10), 1, 0)
-Government.1 <- ifelse((Polity.IV <= 5) & (Polity.IV >= -5), 1, 0)
-Government.2 <- ifelse((Polity.IV <= 10) & (Polity.IV >= 6), 1, 0)
-Government.3 <- ifelse((Polity.IV == -66), 1, 0)
-Government.4 <- ifelse((Polity.IV == -77), 1, 0)
-Government.5 <- ifelse((Polity.IV == -88), 1, 0)
-ten_year_data$Government.0 <- Government.0
-ten_year_data$Government.1 <- Government.1
-ten_year_data$Government.2 <- Government.2
-ten_year_data$Government.3 <- Government.3
-ten_year_data$Government.4 <- Government.4
-ten_year_data$Government.5 <- Government.5
 
 View(ten_year_data)
+
+ten_year_data$Refugee.Asylum <- as.numeric(ten_year_data$Refugee.Asylum)
+ten_year_data$Refugee.Origin <- as.numeric(ten_year_data$Refugee.Origin)
+ten_year_data$Unemployment <- as.numeric(ten_year_data$Unemployment)
+ten_year_data$Caloric.Intake <- as.numeric(ten_year_data$Caloric.Intake)
+ten_year_data$Mobile.Cell.Subs <- as.numeric(ten_year_data$Mobile.Cell.Subs)
+#clean up polity
+
+#ten_year_data$Polity.IV[ten_year_data$Polity.IV == -66|ten_year_data$Polity.IV == -77
+#                        |ten_year_data$Polity.IV == -88] <- 0
+# ten_year_data$Polity.IV[ten_year_data$Regime.Type == "Central ruler/ruling party" & 
+#                           is.na(ten_year_data$Polity.IV)] <- -10
+# ten_year_data$Polity.IV[ten_year_data$Regime.Type == "Democratic" & 
+#                           is.na(ten_year_data$Polity.IV)] <- 10
+# ten_year_data$Polity.IV[ten_year_data$Regime.Type == "Emerging, transitional, recent change, Disputed" & 
+#                          is.na(ten_year_data$Polity.IV)] <- 0
+# attach(ten_year_data)
+# Government.0 <- ifelse((Polity.IV <= -6) & (Polity.IV >= -10), 1, 0)
+# Government.1 <- ifelse((Polity.IV <= 5) & (Polity.IV >= -5), 1, 0)
+# Government.2 <- ifelse((Polity.IV <= 10) & (Polity.IV >= 6), 1, 0)
+# Government.3 <- ifelse((Polity.IV == -66), 1, 0)
+# Government.4 <- ifelse((Polity.IV == -77), 1, 0)
+# Government.5 <- ifelse((Polity.IV == -88), 1, 0)
+# ten_year_data$Government.0 <- Government.0
+# ten_year_data$Government.1 <- Government.1
+# ten_year_data$Government.2 <- Government.2
+# ten_year_data$Government.3 <- Government.3
+# ten_year_data$Government.4 <- Government.4
+# ten_year_data$Government.5 <- Government.5
+
 #View(ten_year_data)
 ```
-
-
-### Identify Missing Variables
-
-```{r}
-
-# Look at the amount of missingness
-library("mice")
-#View(ten_year_data)
-complete_cases <- cc(ten_year_data)
-num_complete_cases <- nrow(complete_cases)
-percent_incomplete_cases <- 1-(num_complete_cases/nrow(ten_year_data))
-percent_incomplete_cases
-#
-missing_pattern <- md.pattern(ten_year_data)
-missing_pattern[nrow(missing_pattern),]
-4304/(nrow(ten_year_data[,3:30])*ncol(ten_year_data[,3:30]))
-```
-
-4304 initially missing observations requiring data imputation. About 7.678\% of the data is missing.
 
 ## Split up data by region
 
@@ -86,7 +74,7 @@ missing_pattern[nrow(missing_pattern),]
 
 # Arab
 Arab <- ten_year_data[ which(ten_year_data$Arab == 1),]
-Arab <- Arab[,2:30]
+Arab <- Arab[,4:33]
 # East_Euro
 East_Euro <- ten_year_data[ which(ten_year_data$East.Europe == 1),]
 East_Euro <- East_Euro[,2:30]
@@ -98,7 +86,7 @@ OECD <- ten_year_data[ which(ten_year_data$OECD == 1),]
 OECD <- OECD[,2:30]
 # SE Asia
 SE_Asia <- ten_year_data[ which(ten_year_data$SE.Asia == 1),]
-SE_Asia <- SE_Asia[,2:30]
+SE_Asia <- SE_Asia[,3:33]
 # Sub_Sahara
 Sub_Sahara <- ten_year_data[ which(ten_year_data$SubSaharan == 1),]
 Sub_Sahara <- Sub_Sahara[,2:30]
@@ -108,168 +96,207 @@ dim(Arab)[1]+dim(East_Euro)[1]+dim(Latin_America)[1]+dim(OECD)[1]+dim(SE_Asia)[1
 dim(ten_year_data)
 ```
 
-## Missingness by region
-
-```{r}
-# Arab <- Arab[,1:30]
-# East_Euro <- East_Euro[,1:30]
-# Latin_America <- Latin_America[,1:30]
-# OECD <- OECD[,1:30]
-# SE_Asia <- SE_Asia[,1:30]
-# Sub_Sahara <- Sub_Sahara[,1:30]
-```
-
-```{r}
-# Arab
-complete_cases <- cc(Arab)
-num_complete_cases <- nrow(complete_cases)
-percent_incomplete_cases <- 1-(num_complete_cases/nrow(Arab))
-percent_incomplete_cases
-#
-missing_pattern <- md.pattern(Arab)
-missing_pattern[nrow(missing_pattern),]
-#
-tot_observations_arab <- nrow(Arab)*ncol(Arab[,-(1)])
-tot_observations_arab
-428/tot_observations_arab
-```
-
-```{r}
-# East Euro
-complete_cases <- cc(East_Euro)
-num_complete_cases <- nrow(complete_cases)
-percent_incomplete_cases <- 1-(num_complete_cases/nrow(East_Euro))
-percent_incomplete_cases
-#
-missing_pattern <- md.pattern(East_Euro)
-missing_pattern[nrow(missing_pattern),]
-#
-tot_observations_east_euro <- nrow(East_Euro)*ncol(East_Euro[,-(1)])
-tot_observations_east_euro
-496/tot_observations_east_euro
-```
-
-```{r}
-# Latin America
-complete_cases <- cc(Latin_America)
-num_complete_cases <- nrow(complete_cases)
-percent_incomplete_cases <- 1-(num_complete_cases/nrow(Latin_America))
-percent_incomplete_cases
-#
-missing_pattern <- md.pattern(Latin_America)
-missing_pattern[nrow(missing_pattern),]
-#
-tot_observations_latin <- nrow(Latin_America)*ncol(Latin_America[,-(1)])
-tot_observations_latin
-699/tot_observations_latin
-```
-
-```{r}
-# OECD
-complete_cases <- cc(OECD)
-num_complete_cases <- nrow(complete_cases)
-percent_incomplete_cases <- 1-(num_complete_cases/nrow(OECD))
-percent_incomplete_cases
-#
-missing_pattern <- md.pattern(OECD)
-missing_pattern[nrow(missing_pattern),]
-#
-tot_observations_oecd <- nrow(OECD)*ncol(OECD[,-(1)])
-tot_observations_arab
-386/tot_observations_arab
-```
-
-```{r}
-# SE Asia
-complete_cases <- cc(SE_Asia)
-num_complete_cases <- nrow(complete_cases)
-percent_incomplete_cases <- 1-(num_complete_cases/nrow(SE_Asia))
-percent_incomplete_cases
-#
-missing_pattern <- md.pattern(SE_Asia)
-missing_pattern[nrow(missing_pattern),]
-#
-tot_observations_SE_asia <- nrow(SE_Asia)*ncol(SE_Asia[,-(1)])
-tot_observations_SE_asia
-997/tot_observations_SE_asia
-```
-
-```{r}
-# Sub Sahara 
-complete_cases <- cc(Sub_Sahara)
-num_complete_cases <- nrow(complete_cases)
-percent_incomplete_cases <- 1-(num_complete_cases/nrow(Sub_Sahara))
-percent_incomplete_cases
-#
-missing_pattern <- md.pattern(Sub_Sahara)
-missing_pattern[nrow(missing_pattern),]
-#
-tot_observations_sahara <- nrow(Sub_Sahara)*ncol(Sub_Sahara[,-(1)])
-tot_observations_sahara
-1298/tot_observations_sahara
-```
-
 ## Joint Modeling Imputation
 
+```{r message=FALSE, warning=FALSE, include=FALSE}
+install.packages("mice",repos = "http://cran.us.r-project.org")
+
+int_arab_mice <- mice(Arab, maxit = 0)
+meth <- int_arab_mice$method
+pred <- int_arab_mice$predictorMatrix
+pred[,c("Arable.Lands","Birth.Rate","Death.Rate","Fertility.Rate",
+        "Life.Expectancy","Regime.Type","Religious.Diversity","Population.Growth",
+        "Ethnic.Diversity", "Infant.Mortality.Rate")] <- 0
+
+jm_arab <- mice(Arab, m=5, maxit=20, seed=1700, print = FALSE, method = meth, predictorMatrix = pred)
+```
+
 ```{r}
+plot(jm_arab)
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
 # Arab Imputation
-#install.packages("mice")
-#library(mice)
-Arab$Regime.Type <- as.integer((Arab$Regime.Type))
-Arab$Polity.IV <- as.numeric(as.character(Arab$Polity.IV))
-#jm_arab <- mice(Arab, m=5, maxit=5, seed=1700, print = FALSE)
+install.packages('mice')
+library(mice)
+Arab$Polity.IV <- as.numeric(Arab$Polity.IV)
+Arab$HIIK.Conflict.Intensity <- as.numeric(Arab$HIIK.Conflict.Intensity)
+int_arab_mice <- mice::mice(Arab, maxit = 0)
+meth <- int_arab_mice$method
+pred <- int_arab_mice$predictorMatrix
+meth
+pred[,c("Arable.Lands","Birth.Rate","Death.Rate","Fertility.Rate",
+        "Life.Expectancy","Infant.Mortality.Rate","Youth.Bulge",
+        "Population.Density","Population.Growth",
+        "Refugee.Origin","Religious.Diversity","Unemployment",
+        "Polity.IV","HIIK.Conflict.Intensity","Ethnic.Diversity",
+        "Religious.Diversity",
+        "Percent.Border.Conflict","Two.Year.Conflict.Intensity.Trend",
+        "Mobile.Cell.Subs")] <- 0
+meth[c("GDP.Per.Capita","Caloric.Intake","Freshwater.per.Capita",
+       "Military.Expend.Gov.Spending")] <- c("cart","cart","cart","cart")
+jm_arab <- mice::mice(Arab, m=5, maxit=20, seed=1700, print = FALSE, method = meth, predictorMatrix = pred)
+summary(jm_arab)
 ```
 
 ```{r}
-# East Euro Imputation
-East_Euro$Regime.Type <- as.integer((East_Euro$Regime.Type))
-East_Euro$Polity.IV <- as.numeric(as.character(East_Euro$Polity.IV))
-#jm_east_euro <- mice(East_Euro, m=5, maxit=5, seed=1700)
+plot(jm_arab)
+library(xlsx)
+stacked_long <- complete(jm_arab, "long", include = TRUE)
+#write.xlsx(stacked_long,
+#           "C:/Users/ZKane/OneDrive/Documents/Thesis/Imputation Selection Results/arab_imp_long.xlsx")
+
 ```
 
-```{r}
-#Latin America Imputation
-Latin_America$Regime.Type <- as.integer((Latin_America$Regime.Type))
-Latin_America$Polity.IV <- as.numeric(as.character(Latin_America$Polity.IV))
-jm_latin_america <- mice(Latin_America, m=10, maxit=20, seed=1700, print = FALSE)
-View(Latin_America)
-#average_imputation <- function(x) {
-#    stacked <- (complete(x,1)+complete(x,2)+complete(x,3)+complete(x,4)+complete(x,5)+
-#                  complete(x,6)+complete(x,7)+complete(x,8)+complete(x,9)+complete(x,10))/10
-#}
+<!-- ```{r} -->
+<!-- # East Euro Imputation -->
+<!-- attach(East_Euro) -->
+<!-- test_euro=data.frame(subset(East_Euro, select = -c(Birth.Rate, Year, Regime.Type, Religious.Diversity, -->
+<!--                                                    Ethnic.Diversity))) -->
+<!-- detach(East_Euro) -->
+<!-- dim(test_euro) -->
+<!-- View(test_euro) -->
+<!-- meth <- c("norm","","","norm","pmm","","cart","rf","","","","cart","pmm","pmm","cart", -->
+<!--           "cart","","","pmm","pmm","cart","rf","pmm","") -->
+<!-- length(meth) -->
+<!-- jm_east_euro <- mice(test_euro, m=5, maxit=20, seed=1700, print = FALSE, method = meth) -->
 
-#stacked <- average_imputation(jm_latin_america)
-```
+<!-- ``` -->
 
-```{r}
-#OECD
-OECD$Regime.Type <- as.integer((OECD$Regime.Type))
-OECD$Polity.IV <- as.numeric(as.character(OECD$Polity.IV))
-jm_oecd <- mice(OECD, m=10, maxit=20, seed=1700, print = FALSE)
-```
+<!-- ```{r} -->
+<!-- #Latin America Imputation -->
+<!-- attach(Latin_America) -->
+<!-- test_latamer=data.frame(subset(Latin_America, select = -c(Year, Regime.Type))) -->
+<!-- detach(Latin_America) -->
+<!-- View(test_latamer) -->
+<!-- meth <- c("","","","","cart", -->
+<!--           "","","rf","rf","", -->
+<!--           "","","","pmm","", -->
+<!--           "rf","norm","pmm","","cart", -->
+<!--           "","","","","", -->
+<!--           "","norm") -->
+<!-- length(meth) -->
+<!-- jm_latin_america <- mice(test_latamer, m=5, maxit=20, seed=1700, print = FALSE, method = meth) -->
+<!-- #average_imputation <- function(x) { -->
+<!-- #    stacked <- (complete(x,1)+complete(x,2)+complete(x,3)+complete(x,4)+complete(x,5)+ -->
+<!-- #                  complete(x,6)+complete(x,7)+complete(x,8)+complete(x,9)+complete(x,10))/10 -->
+<!-- #} -->
 
-```{r}
+<!-- #stacked <- average_imputation(jm_latin_america) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- #OECD -->
+<!-- attach(OECD) -->
+<!-- test_oecd=data.frame(subset(OECD, select = -c(Year, Regime.Type))) -->
+<!-- detach(OECD) -->
+<!-- View(test_oecd) -->
+<!-- meth <- c("","","","","cart", -->
+<!--           "cart","","rf","cart","", -->
+<!--           "rf","","","","cart", -->
+<!--           "rf","pmm","","","rf", -->
+<!--           "","","","","", -->
+<!--           "","") -->
+<!-- length(meth) -->
+<!-- jm_oecd <- mice(test_oecd, m=5, maxit=20, seed=1700, print = FALSE, method = meth) -->
+<!-- ``` -->
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
 # SE Asia
-SE_Asia$Regime.Type <- as.integer((SE_Asia$Regime.Type))
-SE_Asia$Polity.IV <- as.numeric(as.character(SE_Asia$Polity.IV))
-jm_SE_asia<- mice(SE_Asia, m=10, maxit=20, seed=1700, print = FALSE)
+int_se_asia_imp <- mice(SE_Asia, maxit = 0)
+pred <- int_se_asia_imp$predictorMatrix
+(meth <- int_se_asia_imp$method)
+
+jm_SE_asia<- mice(SE_Asia, m=5, maxit=20, seed=1700, print = FALSE, method = meth,
+                  predictorMatrix = pred)
 ```
 
 ```{r}
-# Sub Suhara
-Sub_Sahara$Regime.Type <- as.integer((Sub_Sahara$Regime.Type))
-Sub_Sahara$Polity.IV <- as.numeric(as.character(Sub_Sahara$Polity.IV))
-jm_sub_sahara <- mice(Sub_Sahara, m=10, maxit=20, seed=1700, print = FALSE)
+plot(jm_SE_asia)
 ```
 
-### Imputation Method Selection
-
+```{r message=FALSE, warning=FALSE, include=FALSE}
+jm_SE_asia<- mice(SE_Asia, m=5, maxit=30, seed=1700, print = FALSE, method = meth,
+                  predictorMatrix = pred)
+```
 
 ```{r}
-#densityplot(jm_latin_america)
-#stripplot(jm_latin_america)
+plot(jm_SE_asia)
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+SE_Asia$Polity.IV <- as.numeric(SE_Asia$Polity.IV)
+SE_Asia$HIIK.Conflict.Intensity <- as.numeric(SE_Asia$HIIK.Conflict.Intensity)
+int_se_asia_imp <- mice(SE_Asia, maxit = 0)
+pred <- int_se_asia_imp$predictorMatrix
+(meth <- int_se_asia_imp$method)
+meth[c("GDP.Per.Capita", "Caloric.Intake", "Military.Expend.GDP",
+       "Military.Expend.Gov.Spending","Freshwater.per.Capita")] <- c("rf","rf","rf","rf","cart")
+
+pred[,c("Freedom.Score","Arable.Lands","Birth.Rate", "Death.Rate",
+        "Fertility.Rate","Life.Expectancy","Infant.Mortality.Rate",
+        "Youth.Bulge","Population.Density","Polity.IV","Ethnic.Diversity",
+        "HIIK.Conflict.Intensity","Freedom.Score","X2.Year.Freedom.Trend",
+        "X3.Year.Freedom.Trend","X5.Year.Freedom.Trend",
+        "Percent.Border.Conflict", "Two.Year.Conflict.Intensity.Trend"
+        )] <- 0
+pred
+newdata <- na.omit(SE_Asia)
+V <- cov(SE_Asia, use = "complete.obs" )
+eigensV <- eigen(V)
+eigensV$values
+eigensV$vectors[27,30]
+colnames(SE_Asia)[28]
+dim(na.omit(SE_Asia))
+library(mice)
+jm_SE_asia<- mice(SE_Asia[,-28], m=5, maxit=20, seed=1700, print = FALSE, method = meth[-28])
+library(xlsx)
+summary(jm_SE_asia)
+save(jm_SE_asia, file = "C:/Users/ZKane/OneDrive/Documents/KaneThesis/completed_SE_Asia.RData")
+jm_SE_asia_Mobile_Cells <- mice(SE_Asia[,c("Year","Freedom.Score","Arable.Lands","Birth.Rate", "Death.Rate",
+        "Fertility.Rate","Life.Expectancy","Infant.Mortality.Rate",
+        "Youth.Bulge","Population.Density","Polity.IV","Ethnic.Diversity",
+        "HIIK.Conflict.Intensity","X2.Year.Freedom.Trend",
+        "X3.Year.Freedom.Trend","X5.Year.Freedom.Trend",
+        "Percent.Border.Conflict", "Two.Year.Conflict.Intensity.Trend","Mobile.Cell.Subs")],
+        m=5, maxit = 20, seed = 20, print = FALSE)
+summary(jm_SE_asia_Mobile_Cells)
+#save(jm_SE_asia_Mobile_Cells, file = "C:/Users/ZKane/OneDrive/Documents/KaneThesis/SE_Asia_Mobile_imp.RData")
+#summary(jm_SE_asia_Mobile_Cells)
+#write.xlsx(complete(jm_SE_asia_Mobile_Cells, "long", include = TRUE),
+#           file = "C:/Users/ZKane/OneDrive/Documents/KaneThesis/SE_Asia_Mobile_completed.xlsx")
 
 ```
+
+```{r}
+plot(jm_SE_asia)
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+jm_SE_asia<- mice(SE_Asia, m=5, maxit=30, seed=1700, print = FALSE, method = meth,
+                  predictorMatrix = pred)
+```
+
+```{r}
+plot(jm_SE_asia)
+
+```
+
+# ```{r}
+# # Sub Suhara
+# attach(Sub_Sahara)
+# test_sub_sahara=data.frame(subset(Sub_Sahara, select = -c(Year, Regime.Type)))
+# detach(Sub_Sahara)
+# View(test_sub_sahara)
+# meth <- c("pmm","","","","pmm",
+#           "rf","","rf","cart","",
+#           "","pmm","","pmm","pmm",
+#           "rf","cart","rf","","rf",
+#           "cart","cart","rf","cart","",
+#           "","rf")
+# length(meth)
+# jm_sub_sahara <- mice(test_sub_sahara, m=5, maxit=20, seed=1700, print = FALSE, method = meth)
+# ```
 
 
 ## Latin America Regression Models
@@ -292,18 +319,18 @@ average_imputation <- function(x) {
                   complete(x,6)+complete(x,7)+complete(x,8)+complete(x,9)+complete(x,10))/10
 }
 
-stacked <- average_imputation(jm_latin_america)
-
-library(MASS)
-null <- lm(Arable.Lands~1, data = stacked)
-full <- lm(Arable.Lands~(Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type)^2,data=stacked)
-step <- step(null, scope = list(lower = null, upper = full), direction="both")
-summary(step)
-
-model.aic.backward <- step(full, direction = "backward", trace = 1)
-model.aic.forward <- step(null, direction = "forward", trace = 1, scope = ~(Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type)^2)
-
-View(ten_year_data)
+# stacked <- average_imputation(jm_latin_america)
+# 
+# library(MASS)
+# null <- lm(Arable.Lands~1, data = stacked)
+# full <- lm(Arable.Lands~(Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type)^2,data=stacked)
+# step <- step(null, scope = list(lower = null, upper = full), direction="both")
+# summary(step)
+# 
+# model.aic.backward <- step(full, direction = "backward", trace = 1)
+# model.aic.forward <- step(null, direction = "forward", trace = 1, scope = ~(Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type)^2)
+# 
+# View(ten_year_data)
 #attach(jm_latin_america)
 #expr <- expression(f1 <- lm(Arable.Lands ~ 1), f2 <- step(f1, 
 #                  scope = list(upper = ~ (Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type)^2), lower = ~ 1))
@@ -317,366 +344,366 @@ View(ten_year_data)
 ```
 
 
-```{r, results="hide", message=FALSE}
-# # Birth Rate - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Birth.Rate ~ 1), 
-                   f2 <- step(f1, scope=list(upper = ~(Arable.Lands+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type)^2), lower = ~ 1, direction = "forward"))
+<!-- ```{r eval=FALSE, message=FALSE, include=FALSE, results="hide"} -->
+<!-- # # Birth Rate - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Birth.Rate ~ 1),  -->
+<!--                    f2 <- step(f1, scope=list(upper = ~(Arable.Lands+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type)^2), lower = ~ 1, direction = "forward")) -->
 
-fit <- with(jm_latin_america, expr)
-summary(fit)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-
-
-```
-
-```{r, results="hide", message=FALSE}
-# # Death Rate - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Death.Rate ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- summary(fit) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
 
 
+<!-- ``` -->
 
-```{r, results="hide", message=FALSE}
-# # Fertility Rate - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Fertility.Rate ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r, results="hide", message=FALSE}
-# # GDP per Capita - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(GDP.Per.Capita ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r, results="hide", message=FALSE}
-# # Improved Water Source - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Improved.Water.Source ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r, results="hide", message=FALSE}
-# # Life Expectancy - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Life.Expectancy ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Fertility.Rate+Death.Rate+GDP.Per.Capita+Improved.Water.Source+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r, results="hide", message=FALSE}
-# # Military Expend GDP - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Military.Expend.GDP ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Fertility.Rate+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r, results="hide", message=FALSE}
-# # Military Expend Gov Spending Rate - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Military.Expend.Gov.Spending ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Fertility.Rate+Military.Expend.GDP+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r, results="hide", message=FALSE}
-# # Infant Mortality Rate - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Infant.Mortality.Rate ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Fertility.Rate+Birth.Rate+Death.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r, results="hide", message=FALSE}
-# # Youth Bulge - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Youth.Bulge ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Fertility.Rate+Birth.Rate+Death.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
+<!-- ```{r eval=FALSE, message=FALSE, include=FALSE, results="hide"} -->
+<!-- # # Death Rate - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Death.Rate ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
 
 
-```{r, results="hide", message=FALSE}
-# # Population Density - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Population.Density ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
+
+<!-- ```{r, results="hide", message=FALSE} -->
+<!-- # # Fertility Rate - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Fertility.Rate ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r, results="hide", message=FALSE} -->
+<!-- # # GDP per Capita - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(GDP.Per.Capita ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r, results="hide", message=FALSE} -->
+<!-- # # Improved Water Source - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Improved.Water.Source ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r, results="hide", message=FALSE} -->
+<!-- # # Life Expectancy - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Life.Expectancy ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Fertility.Rate+Death.Rate+GDP.Per.Capita+Improved.Water.Source+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r, results="hide", message=FALSE} -->
+<!-- # # Military Expend GDP - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Military.Expend.GDP ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Fertility.Rate+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r, results="hide", message=FALSE} -->
+<!-- # # Military Expend Gov Spending Rate - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Military.Expend.Gov.Spending ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Fertility.Rate+Military.Expend.GDP+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r, results="hide", message=FALSE} -->
+<!-- # # Infant Mortality Rate - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Infant.Mortality.Rate ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Fertility.Rate+Birth.Rate+Death.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r, results="hide", message=FALSE} -->
+<!-- # # Youth Bulge - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Youth.Bulge ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Fertility.Rate+Birth.Rate+Death.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
 
 
-```{r , results="hide", message=FALSE}
-# # Population Growth - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Population.Growth ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r , results="hide", message=FALSE}
-# # Refugee Asylum - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Refugee.Asylum ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r , results="hide", message=FALSE}
-# # Refugee Origin - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Refugee.Origin ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r , results="hide", message=FALSE}
-# # Freshwater per Capita - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Freshwater.per.Capita ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r , results="hide", message=FALSE}
-# # Trade Percent GDP - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Trade.percent.GDP ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r , results="hide", message=FALSE}
-# # Unemployment - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Unemployment ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r , results="hide", message=FALSE}
-# # Polity IV - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Polity.IV ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r , results="hide", message=FALSE}
-# # Caloric Intake - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Caloric.Intake ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r , results="hide", message=FALSE}
-# # Freedom Score - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Freedom.Score ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r , results="hide", message=FALSE}
-# # 2 Year Freedom Trend - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(X2.Year.Freedom.Trend ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r , results="hide", message=FALSE}
-# # 3 Year Freedom Trend - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(X3.Year.Freedom.Trend ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r , results="hide", message=FALSE}
-# # 5 Year Freedom Trend - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(X5.Year.Freedom.Trend ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r , results="hide", message=FALSE}
-# # Conflict in Bordering States - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Conflict.in.Bordering.States ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
-
-```{r , results="hide", message=FALSE}
-# # Ethnic Diversity - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Ethnic.Diversity ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Religious.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
+<!-- ```{r, results="hide", message=FALSE} -->
+<!-- # # Population Density - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Population.Density ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
 
 
-```{r , results="hide", message=FALSE}
-# # Religious Diversity - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Religious.Diversity ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Regime.Type), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # Population Growth - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Population.Growth ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # Refugee Asylum - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Refugee.Asylum ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # Refugee Origin - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Refugee.Origin ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # Freshwater per Capita - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Freshwater.per.Capita ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # Trade Percent GDP - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Trade.percent.GDP ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # Unemployment - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Unemployment ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # Polity IV - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Polity.IV ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # Caloric Intake - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Caloric.Intake ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # Freedom Score - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Freedom.Score ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # 2 Year Freedom Trend - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(X2.Year.Freedom.Trend ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # 3 Year Freedom Trend - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(X3.Year.Freedom.Trend ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # 5 Year Freedom Trend - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(X5.Year.Freedom.Trend ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # Conflict in Bordering States - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Conflict.in.Bordering.States ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Ethnic.Diversity+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # Ethnic Diversity - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Ethnic.Diversity ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Religious.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
 
 
-```{r , results="hide", message=FALSE}
-# # Regime Type - Latin America
-# # 
-attach(jm_latin_america)
-expr <- expression(f1 <- lm(Regime.Type ~ 1), f2 <- step(f1, 
-                  scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity), lower = ~ 1))
-fit <- with(jm_latin_america, expr)
-formulas <- lapply(fit$analyses, formula)
-terms <- lapply(formulas, terms)
-vars <- unlist(lapply(terms, labels))
-table(vars)
-```
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # Religious Diversity - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Religious.Diversity ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Regime.Type), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
+
+
+<!-- ```{r , results="hide", message=FALSE} -->
+<!-- # # Regime Type - Latin America -->
+<!-- # #  -->
+<!-- attach(jm_latin_america) -->
+<!-- expr <- expression(f1 <- lm(Regime.Type ~ 1), f2 <- step(f1,  -->
+<!--                   scope = list(upper = ~ Arable.Lands+Birth.Rate+Death.Rate+Fertility.Rate+GDP.Per.Capita+Improved.Water.Source+Life.Expectancy+Military.Expend.GDP+Military.Expend.Gov.Spending+Infant.Mortality.Rate+Youth.Bulge+Population.Density+Population.Growth+Refugee.Asylum+Refugee.Origin+Freshwater.per.Capita+Trade.percent.GDP+Unemployment+Polity.IV+Caloric.Intake+Freedom.Score+X2.Year.Freedom.Trend+X3.Year.Freedom.Trend+X5.Year.Freedom.Trend+Conflict.in.Bordering.States+Ethnic.Diversity+Religious.Diversity), lower = ~ 1)) -->
+<!-- fit <- with(jm_latin_america, expr) -->
+<!-- formulas <- lapply(fit$analyses, formula) -->
+<!-- terms <- lapply(formulas, terms) -->
+<!-- vars <- unlist(lapply(terms, labels)) -->
+<!-- table(vars) -->
+<!-- ``` -->
 
 
 ### OECD Regression Models
@@ -707,7 +734,13 @@ table(vars)
 
 
 
+```{r}
+#arab_imp <- complete()
 
+#save(jm_arab,jm_east_euro,jm_oecd,jm_latin_america,jm_sub_sahara,jm_SE_asia, file = "final_imp.Rdata")
+
+
+```
 
 
 

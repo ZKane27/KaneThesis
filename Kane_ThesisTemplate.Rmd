@@ -1,0 +1,223 @@
+---
+title:        "`r DODschools::noTouch('metadata.yml')$document$title`"
+designator:   "`r DODschools::noTouch('metadata.yml')$document$designator`"
+doctype:      "`r DODschools::noTouch('metadata.yml')$document$type`"
+pages:        "`r DODschools::noTouch('metadata.yml')$document$pages`"
+abstract:     "`r DODschools::noTouch('metadata.yml')$abstract`"
+dedication:   "`r DODschools::noTouch('metadata.yml')$dedication`"
+acknowledge:  "`r DODschools::noTouch('metadata.yml')$acknowledgement`"
+vita:         "`r DODschools::noTouch('metadata.yml')$vita`"
+degree:       "`r DODschools::noTouch('metadata.yml')$degree`"
+program:      "`r DODschools::noTouch('metadata.yml')$program`"
+distro1:      "`r DODschools::noTouch('metadata.yml')$distro_thesis[1]`"
+distro2:      "`r DODschools::noTouch('metadata.yml')$distro_thesis[2]`"
+author:
+  name:       "`r DODschools::noTouch('metadata.yml')$author$fullname`"
+  dept:       "`r DODschools::noTouch('metadata.yml')$author$dept`"
+  rank:       "`r DODschools::noTouch('metadata.yml')$author$rank`"
+  service:    "`r DODschools::noTouch('metadata.yml')$author$service`"
+  prevdegree: "`r DODschools::noTouch('metadata.yml')$author$currentDegree`"
+  email:      "`r DODschools::noTouch('metadata.yml')$author$email`"
+advisor:
+  name:       "`r DODschools::noTouch('metadata.yml')$advisor$name`"
+  department: "`r DODschools::noTouch('metadata.yml')$advisor$department`"
+  rank:       "`r DODschools::noTouch('metadata.yml')$advisor$rank`"
+  service:    "`r DODschools::noTouch('metadata.yml')$advisor$service`"
+  degree:     "`r DODschools::noTouch('metadata.yml')$advisor$currentDegree`"
+  phone:      "`r DODschools::noTouch('metadata.yml')$advisor$phone`"
+  email:      "`r DODschools::noTouch('metadata.yml')$advisor$email`"
+reader1:
+  name:       "`r DODschools::noTouch('metadata.yml')$reader1$name`"
+  department: "`r DODschools::noTouch('metadata.yml')$reader1$dept`"
+  rank:       "`r DODschools::noTouch('metadata.yml')$reader1$rank`"
+  service:    "`r DODschools::noTouch('metadata.yml')$reader1$service`"
+  prevdegree: "`r DODschools::noTouch('metadata.yml')$reader1$currentDegree`"
+reader2:
+  name:       "`r DODschools::noTouch('metadata.yml')$reader2$name`"
+  department: "`r DODschools::noTouch('metadata.yml')$reader2$dept`"
+  rank:       "`r DODschools::noTouch('metadata.yml')$reader2$rank`"
+  service:    "`r DODschools::noTouch('metadata.yml')$reader2$service`"
+  prevdegree: "`r DODschools::noTouch('metadata.yml')$reader2$currentDegree`"
+reader3:
+  name:       "`r DODschools::noTouch('metadata.yml')$reader3$name`"
+  department: "`r DODschools::noTouch('metadata.yml')$reader3$dept`"
+  rank:       "`r DODschools::noTouch('metadata.yml')$reader3$rank`"
+  service:    "`r DODschools::noTouch('metadata.yml')$reader3$service`"
+  prevdegree: "`r DODschools::noTouch('metadata.yml')$reader3$currentDegree`"
+sf298name:    "`r DODschools::noTouch('metadata.yml')$author$sf298name`"
+contractnum:  "`r DODschools::noTouch('metadata.yml')$sf298$contractnum`"
+grantnum:     "`r DODschools::noTouch('metadata.yml')$sf298$grantnum`"
+prognum:      "`r DODschools::noTouch('metadata.yml')$sf298$programnum`"
+projnum:      "`r DODschools::noTouch('metadata.yml')$sf298$projectnum`"
+tasknum:      "`r DODschools::noTouch('metadata.yml')$sf298$tasknum`"
+worknum:      "`r DODschools::noTouch('metadata.yml')$sf298$workunitnum`"
+keywords:     "`r DODschools::noTouch('metadata.yml')$sf298$keywords`"
+sponsor:
+  title:    "`r DODschools::noTouch('metadata.yml')$sf298$sponsor$title`"
+  subtitle: "`r DODschools::noTouch('metadata.yml')$sf298$sponsor$subtitle`"
+  address1: "`r DODschools::noTouch('metadata.yml')$sf298$sponsor$address1`"
+  address2: "`r DODschools::noTouch('metadata.yml')$sf298$sponsor$address2`"
+  phone:    "`r DODschools::noTouch('metadata.yml')$sf298$sponsor$phone`"
+  email1:   "`r DODschools::noTouch('metadata.yml')$sf298$sponsor$email1`"
+  email2:   "`r DODschools::noTouch('metadata.yml')$sf298$sponsor$email2`"
+  acronym:  "`r DODschools::noTouch('metadata.yml')$sf298$sponsor$acronym`"
+  rptnum:   "`r DODschools::noTouch('metadata.yml')$sf298$sponsor$report_number`"
+graddate:   "`r DODschools::noTouch('metadata.yml')$grad_date`"
+date:       "`r format(Sys.Date(), '%B %Y')`"
+sf298_date: "`r format(Sys.Date(), '%d-%m-%Y')`"
+dissertation: "`r DODschools::noTouch('metadata.yml')$dissertation`"
+cite_style: "`r DODschools::noTouch('metadata.yml')$cite_style`"
+cite_shape: "`r DODschools::noTouch('metadata.yml')$cite_shape`"
+output: 
+  DODschools::afit_thesis:
+    includes:
+      in_header:    scripts/tex/in_header.tex
+      before_body:  scripts/tex/before_body.tex
+      after_body:   scripts/tex/after_body.tex
+---
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+pacman::p_load(devtools,
+               knitcitations,
+               RefManageR,
+               xtable,
+               sas7bdat,
+               dplyr,
+               survival,
+               flexsurv,
+               knitr,
+               formattable,
+               data.table,
+               kableExtra,
+               survminer,
+               gridExtra,
+               png)
+source('scripts/R/setup.R')
+
+
+install_github("Auburngrads/DODschools")
+
+options(knitr.table.format = "latex")
+options(kableExtra.latex.load_packages = FALSE)
+library(kableExtra)
+
+#source('scripts/R/setup.R')
+
+#BIB <- ReadBib('references/my_bib.bib')
+#knitcitations <- BIB[title = 'knitcitations']
+#refmanager    <- BIB[title = 'RefManageR']
+#pressure      <- BIB[key = 'randolph2016']
+#cite_options(citation_format = 'pandoc')
+```
+
+# Introduction
+
+## Background
+
+## Problem Statement
+
+## Research Objectives
+
+## Research Questions
+
+## Assumptions and Limitations
+
+## Overview
+
+# Literature Review
+
+# Methodology
+
+## Overview
+
+## Database
+
+## Imputation 
+
+### Missing Data
+
+This study assumed that all of the unobserved data is missing at random. This means that probability of being missing is not the same for all cases but within that group of data's observed values (CITE Buuren). The probability that a data point is missing only depends on observed data values and not any unobserved or outside it's group. Assuming the data is missing at random is the foundation for this research's applied imputation methods. The original data was missing observations for 19 of the 28 variables over the past ten years. The missing observations accounted for about 7.35\% of the data's total observations. After dividing the data by region, the missingness per region ranged between 3.22\% and 9.05\% of the entire regions observations. 
+
+Before applying more complex imputation methods, the variable Polity IV's missing observations were filled using information provided by observed data in the Regime Type variable. Goldstone's CIA study created the Regime Type variable as an indicator of political instability (CITE Neumann #7). Regime type originally had 57 descriptors of a country's government, and Boekstein simplified the variable down to just a three level indicator (CITE Neumann #15). Regime type is observable and constant each year for every country analyzed in this study. The Polity IV is an integer variable ranging from -10 to 10 where a -10 means a country's government is fully autocratic and 10 fully democratic. Specific Polity IV indicators were given to those country's with anarchies, transitioning governments, or governments experiencing a foreign interruption. The missing observations for Polity IV were filled based on the Regime Type of a country using the mapping of the three levels of Regime Type as seen in Table XX.
+
+### Mulitple Imputation by Chained Equations
+
+Multiple imputation by chained equations (MICE) was the method used to impute the remaining missing observations. The MICE package in R allowed this method to be applied to each multivariate data set of Neumann's six world regions (CITE Mice R Package). Multiple imputation creates _m_ > 1 complete versions of the data by filling the missing observations with plausible data values (CITE Buuren). Using multiple imputed data sets helps address the statistical uncertainity involved with impututing data. The MICE algorithm is a fully conditional specification imputation method which means it imputes multivariate missing data in a variable-by-variable manner (CITE Buuren). MICE predicts a column of missing data as a the target variable in a regression equation with the all the other variables as the predictors unless other specified (CITE R MICE package). If a predictor is missing an observation, then the most recent iteration's imputation value is used to impute the target variable (CITE MICE package). MICE is a Markov chain Monte Carlo method in which the state space consists of of all imputed values. The MICE algorithm must satisfy three properties to converge, just as any Markov chain would converge to a stationary distribution.
+
+  * irreducible, the chain must be able to reach all interesting parts of the state space
+  * aperiodic, the chain should not oscillate between different staes
+  * recurrence, all inresting parts can be reached infinitely often at least from almost all starting points
+  
+The first step in filling in the initial missing data observations was checking to see if the MICE algorithm was converging for each region. Van Burren identified there being no clear-cut method for determining whether the MICE algorithm has converged but that suitable imputations can be spotted from plotting one or more parameters versus the iteration number. The means and standard deviations were plotted for each variable's imputation streams. Healthy converges were categorized by freely intermingled different streams, without showing any trends and the variance between different sequences not being larger than the variance within each individual sequence. Below are an example of a healthy convergence when imputing freshwater per capita in South East Asia. 
+
+```{r healthy convergence, eval = TRUE, fig.cap = 'Healhty-Convergence of the MICE Algorithm for Freshwater per Capita in South East Asia',echo=FALSE}
+load("C:/Users/ZKane/OneDrive/Documents/KaneThesis/healthy_convergence.RData")
+
+```
+
+After looking at MICE applied to this analysis's data and seeing previous research's MICE convergences, around 20 iterations there was sufficient convergence by the algorithm. Moving forward each imputation conducted was run for 20 iterations. MICE allows for several different imputation techniques to be specifically applied to each variable every pass. _m_ of these chains are calculated in parallel, and after around 15-20 iterations for one regression chain, the regression coefficents for each missing variables' models are likely to converge (CITE burren page 116). MICE utilizes the columns of fully observed data in these chains. Imputing with a subset of only the missing data or simplified data set may deprive the MICE algorithm of information from the observed data. For this reason, each imputation was performed with the missing and complete columns of data. Multiple imputation procedurely will impute the data, analyze each imputed dataset seperately, and pool the results. The intital imputation began with investigating which MICE method resulted in the data most similiar to the distribution of observed data. The five mice packages tested are shown in Table XX. 
+
+```{r}
+
+```
+
+Between all of the six regions, there were average about 12 variables per region that required imputation by MICE. MICE has the ability to impute and utilize categorical varibales. MICE creates dummy variables for the categorical variables and generates their regressions and resulting imputations from these (CITE MICE R package). None of the variables requiring imputation were categorical, but there were categorical various such as Regime Type that were included in the prediction of other missing variables. The MICE imputation methods investigated were selected based on there not any missing categorical variables and trying to test a wide variety of methods. Imputation using classification and regression trees (CART) seek predictors and cut points in the predictors used to divide up the sample of data. The data is split up repeatidly until a binary tree is build to determine the target variable (CITE Van Buuren). CART methods for imputation are robust against outliers, can handle multicollinearity and skewed distributions, and are able to fit interations and nonlinear relationships (CITE Van Buuren). Predictive mean matching (pmm) is an imputation technique which utilizes the observed data to calculate the predicted target value. It takes a random draw from the candidate donors from the complete cases with predicted values closest to the predicted missing entry value (CITE Van Buuren). 
+
+### Data Normalization
+
+
+
+### Testing Imputation Methods
+
+Each of the five MICE methods were run to develop five different imputed data sets and then compared using the Kolmogorov-Smirnov (K-S) and non-parametric, 2-sample Anderson-Darling (A-D) tests. The K-S test looks at if the imputed data values are similiar to the observed data values. This test makes the assumption that the imputed data should follow the same distribution as the observed data (CITE Abayomi, Brantley #36). Engmann and Cousineau (CITE Brantley 37) compared both the A-D and K-S tests and found that the A-D performed better when analzying moments and small differences in the tails of distributions. Based on these findings, the A-D test for this analysis will be the main differentitor between imputation methods (CITE Brantely). The null hypothesis behind both of these tests is that the distributions come from the same parent distribution. A small p value indicates that the imputed data and original data are significantly different and can be interepreted as a poor imputation method. For some variables missing a high percentage of observations such as Freshwater per Capita which was missing for ~74\%, no imputation method was able to find a statistical similarity between that method's imputed data and the observed data.
+
+In some literature the mean absolute error and root mean square error have been used to assess the performance of an imputation method. This analysis didn't utilize these measures of accuracy based on the difference between true and the imputed data. Due to there being so few complete cases for certain variables, evaluation metrics that were based on knowing the true values for missing data weren't implemented. Van Buuren also detailed the shortcomings of treating imputation as a prediction problem geared towards finding the best value. The goal of multiple imputations is "to obtain statistically valid infrences from incomplete data" (CITE Van Buuren). Also treating imputations as methods to enhance the classification accuracy may favor strange imputation methods (CITE Van Buuren). For these reasons, evaluating and choosing an imputation method becomes an increasingly complex problem. Van Buuren's warning as well as the conflicting results and ties between the K-S and A-D statisitical tests begged for another imputation evaluation metric to decide the optimal method. Diagnostic graphs were implemented lastly to asses the plausibility of each imputation method: box and whisker plot and kernel density plots. The box and whisker plot was chosen over strip plots based on Van Buuren's recommendation that the box and whisker plot is more appropriate for large datasets. Both these plots compare the discrepancyies between the observed and imputed data. Dramatic differences would signify a possibility that something with the imputed data is wrong (CITE Van Buuren). The diagnostic plots were used to validate the results of the A-D and K-S tests as well as break any potential ties from seeing which imputed values from a given are more reasonable. For example the variable freshwater per capita from the Arab region had all five inputed values insignificantly different from the observed data when tested using the A-D and K-S tests. The box and whisker plots and density plots were then examined further differences between imputation techniques. The best performing plots were defined by being closest to the observed data which was inherently subjective when trying to visually tell which plots of imputed data was more different than the observed data's plot. After applying applying the K-S and A-D statistical tests with the diagnostic plots, the imputation methods were discovered for variable in a given region. 
+
+```{r, xtable2, results='asis', eval=TRUE, cache=TRUE}
+load("C:/Users/ZKane/OneDrive/Documents/KaneThesis/healthy_convergence.RData")
+load("C:/Users/ZKane/OneDrive/Documents/KaneThesis/arab_imp.RData")
+load("C:/Users/ZKane/OneDrive/Documents/KaneThesis/SE_Asia_Mobile_imp.RData")
+
+methods_SE_asia <- data.frame(jm_SE_asia$method[which(jm_SE_asia$method != "")])
+methods_arab <- data.frame(jm_arab$method[which(jm_arab$method != "")])
+methods_SE_asia_mobile <- data.frame(jm_SE_asia_Mobile_Cells$method["Mobile.Cell.Subs"])
+names(methods_SE_asia_mobile) <- names(methods_SE_asia)
+methods_SE_asia <- rbind(methods_SE_asia,methods_SE_asia_mobile)
+
+library(data.table)
+methods_arab <- setDT(methods_arab, keep.rownames = TRUE)[]
+methods_SE_asia <- setDT(methods_SE_asia, keep.rownames = TRUE)[]
+methods_SE_asia_mobile <- setDT(methods_SE_asia_mobile, keep.rownames = TRUE)[]
+methods <- merge(methods_arab, methods_SE_asia, by = "rn", all = TRUE)
+colnames(methods) <- c("Variable", "Arab", "South East Asia")
+library(xtable)
+
+xtd2 <- xtable::xtable(methods, caption = 'Imputation Methods Used for Each Variable by Region',
+                       align = "llcc", label = 'table:imp_methods')
+print(xtd2, comment = F, include.rownames=FALSE, scalebox = 0.8,
+      sanitize.text.function = function(x){x}, table.placement = "H")
+```
+
+## Regression Models
+
+With the complete data from the previous ten years since 2014, linear regression models were built for each variable of interest. Neumann's model's for regions in and out of conflict defined the  variable which would be of interest for this research. Each regression model was built with the goal of achieving the most parsimonium model from the other variables in the data. Before the regression models were build and reduced, the data set required certain variables utilized by Neumann's research be developed from the complete imputed data. Van Buuren stressed the importance of developing imputations before any additional variables are generated (CITE Van Buuren).  
+
+### Independent Variable Development
+
+
+
+### Model Building Procedure
+
+
+
+### Assessing Model Adequacy
+
+
+# Analysis And Results
+
+This is the fourth chapter of your thesis
+
+# Conclusion
+
+This is the final chapter of your thesis.
