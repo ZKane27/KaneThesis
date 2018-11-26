@@ -32,18 +32,18 @@ reader1:
   rank:       "`r DODschools::noTouch('metadata.yml')$reader1$rank`"
   service:    "`r DODschools::noTouch('metadata.yml')$reader1$service`"
   prevdegree: "`r DODschools::noTouch('metadata.yml')$reader1$currentDegree`"
-reader2:
-  name:       "`r DODschools::noTouch('metadata.yml')$reader2$name`"
-  department: "`r DODschools::noTouch('metadata.yml')$reader2$dept`"
-  rank:       "`r DODschools::noTouch('metadata.yml')$reader2$rank`"
-  service:    "`r DODschools::noTouch('metadata.yml')$reader2$service`"
-  prevdegree: "`r DODschools::noTouch('metadata.yml')$reader2$currentDegree`"
-reader3:
-  name:       "`r DODschools::noTouch('metadata.yml')$reader3$name`"
-  department: "`r DODschools::noTouch('metadata.yml')$reader3$dept`"
-  rank:       "`r DODschools::noTouch('metadata.yml')$reader3$rank`"
-  service:    "`r DODschools::noTouch('metadata.yml')$reader3$service`"
-  prevdegree: "`r DODschools::noTouch('metadata.yml')$reader3$currentDegree`"
+#reader2:
+#  name:       "`r DODschools::noTouch('metadata.yml')$reader2$name`"
+#  department: "`r DODschools::noTouch('metadata.yml')$reader2$dept`"
+#  rank:       "`r DODschools::noTouch('metadata.yml')$reader2$rank`"
+#  service:    "`r DODschools::noTouch('metadata.yml')$reader2$service`"
+#  prevdegree: "`r DODschools::noTouch('metadata.yml')$reader2$currentDegree`"
+#reader3:
+#  name:       "`r DODschools::noTouch('metadata.yml')$reader3$name`"
+#  department: "`r DODschools::noTouch('metadata.yml')$reader3$dept`"
+#  rank:       "`r DODschools::noTouch('metadata.yml')$reader3$rank`"
+#  service:    "`r DODschools::noTouch('metadata.yml')$reader3$service`"
+#  prevdegree: "`r DODschools::noTouch('metadata.yml')$reader3$currentDegree`"
 sf298name:    "`r DODschools::noTouch('metadata.yml')$author$sf298name`"
 contractnum:  "`r DODschools::noTouch('metadata.yml')$sf298$contractnum`"
 grantnum:     "`r DODschools::noTouch('metadata.yml')$sf298$grantnum`"
@@ -137,9 +137,26 @@ library(kableExtra)
 
 ### Missing Data
 
-This study assumed that all of the unobserved data is missing at random. This means that probability of being missing is not the same for all cases but within that group of data's observed values (CITE Buuren). The probability that a data point is missing only depends on observed data values and not any unobserved or outside it's group. Assuming the data is missing at random is the foundation for this research's applied imputation methods. The original data was missing observations for 19 of the 28 variables over the past ten years. The missing observations accounted for about 7.35\% of the data's total observations. After dividing the data by region, the missingness per region ranged between 3.22\% and 9.05\% of the entire regions observations. 
+This study assumed that all of the unobserved data is missing at random. This means that probability of being missing is not the same for all cases but within that group of data's observed values (CITE Buuren). The probability that a data point is missing only depends on observed data values and not any unobserved or outside it's group. Assuming the data is missing at random is the foundation for this research's applied imputation methods. The original data was missing observations for 21 of the 32 variables over the past ten years. The missing observations accounted for about 6.79\% of the data's total observations. After splitting the data by region, the missingness per region ranged between 3.22\% and 9.05\% of the entire regions observations. 
 
-Before applying more complex imputation methods, the variable Polity IV's missing observations were filled using information provided by observed data in the Regime Type variable. Goldstone's CIA study created the Regime Type variable as an indicator of political instability (CITE Neumann #7). Regime type originally had 57 descriptors of a country's government, and Boekstein simplified the variable down to just a three level indicator (CITE Neumann #15). Regime type is observable and constant each year for every country analyzed in this study. The Polity IV is an integer variable ranging from -10 to 10 where a -10 means a country's government is fully autocratic and 10 fully democratic. Specific Polity IV indicators were given to those country's with anarchies, transitioning governments, or governments experiencing a foreign interruption. The missing observations for Polity IV were filled based on the Regime Type of a country using the mapping of the three levels of Regime Type as seen in Table XX.
+Before applying more complex imputation methods, the variable Polity IV's missing observations were filled using information provided by the fully observed Regime Type variable. Goldstone's CIA study created the Regime Type variable as an indicator of political instability (CITE Neumann #7). Regime type originally had 57 descriptors of a country's government, and Boekstein simplified the variable down to just a three level indicator (CITE Neumann #15). Regime type is observable and constant each year for every country analyzed in this study. The Polity IV is an integer variable ranging from -10 to 10 where a -10 means a country's government is fully autocratic and 10 fully democratic. Specific Polity IV indicators were given to those country's with anarchies, transitioning governments, or governments experiencing a foreign interruption. The missing observations for Polity IV were filled based on the Regime Type of a country using the mapping of the three levels of Regime Type as seen in Table XX.
+
+```{r, xtable1, results='asis', eval=TRUE}
+library(kableExtra)
+
+Polity.transform <- data.frame(
+  "Regime Type" = c("Central Ruling Party",
+                  "Emerging, Transitional, Recent Change, and Disputed",
+                  "Democratic"),
+  'Corresponding Polity Value'   = c(-10,0,10)
+)
+
+#kableExtra::kable(text_tbl, "latex", booktabs = T) %>%
+#  kable_styling(position = "center")
+methods_table <- xtable::xtable(Polity.transform, caption = 'Mapping of Regime Type to Fill Missing Polity Values', label = 'table:polity.tranform')
+print(methods_table, comment = F, include.rownames=FALSE, scalebox = 0.9, sanitize.text.function = function(x){x}, table.placement = "H")
+
+```
 
 ### Mulitple Imputation by Chained Equations
 
@@ -158,25 +175,39 @@ load("C:/Users/ZKane/OneDrive/Documents/KaneThesis/healthy_convergence.RData")
 
 After looking at MICE applied to this analysis's data and seeing previous research's MICE convergences, around 20 iterations there was sufficient convergence by the algorithm. Moving forward each imputation conducted was run for 20 iterations. MICE allows for several different imputation techniques to be specifically applied to each variable every pass. _m_ of these chains are calculated in parallel, and after around 15-20 iterations for one regression chain, the regression coefficents for each missing variables' models are likely to converge (CITE burren page 116). MICE utilizes the columns of fully observed data in these chains. Imputing with a subset of only the missing data or simplified data set may deprive the MICE algorithm of information from the observed data. For this reason, each imputation was performed with the missing and complete columns of data. Multiple imputation procedurely will impute the data, analyze each imputed dataset seperately, and pool the results. The intital imputation began with investigating which MICE method resulted in the data most similiar to the distribution of observed data. The five mice packages tested are shown in Table XX. 
 
-```{r}
 
+```{r, xtable2, results='asis', eval=TRUE}
+library(kableExtra)
+
+imp_methods <- data.frame(
+  Method = c("cart", "pmm", "norm", "rf", "mean"),
+  Description = c(
+    "Classification and regression trees",
+    "Predictive mean matching",
+    "Bayesian linear regression",
+    "Random forrest",
+    "Unconditional mean imputation"
+  )
+)
+
+#kableExtra::kable(text_tbl, "latex", booktabs = T) %>%
+#  kable_styling(position = "center")
+methods_table <- xtable::xtable(imp_methods, caption = 'Imputation Methods Tested', label = 'table:imp_methods_tested')
+print(methods_table, comment = F, include.rownames=FALSE, scalebox = 0.9, sanitize.text.function = function(x){x}, table.placement = "H")
 ```
 
-Between all of the six regions, there were average about 12 variables per region that required imputation by MICE. MICE has the ability to impute and utilize categorical varibales. MICE creates dummy variables for the categorical variables and generates their regressions and resulting imputations from these (CITE MICE R package). None of the variables requiring imputation were categorical, but there were categorical various such as Regime Type that were included in the prediction of other missing variables. The MICE imputation methods investigated were selected based on there not any missing categorical variables and trying to test a wide variety of methods. Imputation using classification and regression trees (CART) seek predictors and cut points in the predictors used to divide up the sample of data. The data is split up repeatidly until a binary tree is build to determine the target variable (CITE Van Buuren). CART methods for imputation are robust against outliers, can handle multicollinearity and skewed distributions, and are able to fit interations and nonlinear relationships (CITE Van Buuren). Predictive mean matching (pmm) is an imputation technique which utilizes the observed data to calculate the predicted target value. It takes a random draw from the candidate donors from the complete cases with predicted values closest to the predicted missing entry value (CITE Van Buuren). 
-
-### Data Normalization
-
+Between all of the six regions, there were average about 12 variables per region that required imputation by MICE. MICE has the ability to impute and utilize categorical varibales. MICE creates dummy variables for the categorical variables and generates their regressions and resulting imputations from these (CITE MICE R package). None of the variables requiring imputation were categorical, but there were categorical various such as Regime Type that were included in the prediction of other missing variables. The MICE imputation methods investigated were selected based on there not any missing categorical variables and trying to test a wide variety of methods. Imputation using classification and regression trees (CART) seek predictors and cut points in the predictors used to divide up the sample of data. The data is split up repeatidly until a binary tree is build to determine the target variable (CITE Van Buuren). CART methods for imputation are robust against outliers, can handle multicollinearity and skewed distributions, and are able to fit interations and nonlinear relationships (CITE Van Buuren). Predictive mean matching (pmm) is an imputation technique which utilizes the observed data to calculate the predicted target value. It takes a random draw from the candidate donors from the complete cases with predicted values closest to the predicted missing entry value (CITE Van Buuren). The norm method applies Bayesian linear regression that uses parameter uncertainty from random draws from a posterior probability distribution based on the observed data (CITE Van Buuren). 
 
 
 ### Testing Imputation Methods
 
-Each of the five MICE methods were run to develop five different imputed data sets and then compared using the Kolmogorov-Smirnov (K-S) and non-parametric, 2-sample Anderson-Darling (A-D) tests. The K-S test looks at if the imputed data values are similiar to the observed data values. This test makes the assumption that the imputed data should follow the same distribution as the observed data (CITE Abayomi, Brantley #36). Engmann and Cousineau (CITE Brantley 37) compared both the A-D and K-S tests and found that the A-D performed better when analzying moments and small differences in the tails of distributions. Based on these findings, the A-D test for this analysis will be the main differentitor between imputation methods (CITE Brantely). The null hypothesis behind both of these tests is that the distributions come from the same parent distribution. A small p value indicates that the imputed data and original data are significantly different and can be interepreted as a poor imputation method. For some variables missing a high percentage of observations such as Freshwater per Capita which was missing for ~74\%, no imputation method was able to find a statistical similarity between that method's imputed data and the observed data.
+Each of the five MICE methods were run to develop five different imputed data sets and then compared using the Kolmogorov-Smirnov (K-S) and non-parametric, 2-sample Anderson-Darling (A-D) tests. The K-S test looks at if the imputed data values are similiar to the observed data values. This test makes the assumption that the imputed data should follow the same distribution as the observed data (CITE Abayomi, Brantley #36). Engmann and Cousineau (CITE Brantley 37) compared both the A-D and K-S tests and found that the A-D performed better when analzying moments and small differences in the tails of distributions. Based on these findings, the A-D test for this analysis will be the main differentitor between imputation methods (CITE Brantely). The null hypothesis behind both of these tests is that the distributions come from the same parent distribution. A small p value indicates that the imputed data and original data are significantly different and can be interepreted as a poor imputation method. For some variables missing a high percentage of observations such as Freshwater per Capita which was missing for ~74\% of observations, no imputation method was able to find a statistical similarity between that method's imputed data and the observed data.
 
-In some literature the mean absolute error and root mean square error have been used to assess the performance of an imputation method. This analysis didn't utilize these measures of accuracy based on the difference between true and the imputed data. Due to there being so few complete cases for certain variables, evaluation metrics that were based on knowing the true values for missing data weren't implemented. Van Buuren also detailed the shortcomings of treating imputation as a prediction problem geared towards finding the best value. The goal of multiple imputations is "to obtain statistically valid infrences from incomplete data" (CITE Van Buuren). Also treating imputations as methods to enhance the classification accuracy may favor strange imputation methods (CITE Van Buuren). For these reasons, evaluating and choosing an imputation method becomes an increasingly complex problem. Van Buuren's warning as well as the conflicting results and ties between the K-S and A-D statisitical tests begged for another imputation evaluation metric to decide the optimal method. Diagnostic graphs were implemented lastly to asses the plausibility of each imputation method: box and whisker plot and kernel density plots. The box and whisker plot was chosen over strip plots based on Van Buuren's recommendation that the box and whisker plot is more appropriate for large datasets. Both these plots compare the discrepancyies between the observed and imputed data. Dramatic differences would signify a possibility that something with the imputed data is wrong (CITE Van Buuren). The diagnostic plots were used to validate the results of the A-D and K-S tests as well as break any potential ties from seeing which imputed values from a given are more reasonable. For example the variable freshwater per capita from the Arab region had all five inputed values insignificantly different from the observed data when tested using the A-D and K-S tests. The box and whisker plots and density plots were then examined further differences between imputation techniques. The best performing plots were defined by being closest to the observed data which was inherently subjective when trying to visually tell which plots of imputed data was more different than the observed data's plot. After applying applying the K-S and A-D statistical tests with the diagnostic plots, the imputation methods were discovered for variable in a given region. 
+In some literature the mean absolute error and root mean square error have been used to assess the performance of an imputation method. This analysis didn't utilize these measures of accuracy based on the difference between true and the imputed data. Due to there being so few complete cases for certain variables, evaluation metrics that were based on knowing the true values for missing data weren't implemented. Van Buuren also detailed the shortcomings of treating imputation as a prediction problem geared towards finding the best value. The goal of multiple imputations is "to obtain statistically valid infrences from incomplete data" (CITE Van Buuren). Also treating imputations as methods to enhance the classification accuracy may favor strange imputation methods (CITE Van Buuren). For these reasons, evaluating and choosing an imputation method becomes an increasingly complex problem. Van Buuren's warning as well as the conflicting results and ties between the K-S and A-D statisitical tests begged for another imputation evaluation metric to decide the optimal method. Diagnostic graphs were implemented lastly to asses the plausibility of each imputation method: box and whisker plot and kernel density plots. The box and whisker plot was chosen over strip plots based on Van Buuren's recommendation that the box and whisker plot is more appropriate for large datasets. Both these plots compare the discrepancyies between the observed and imputed data. Dramatic differences would signify a possibility that something with the imputed data needed further investigating (CITE Van Buuren). The diagnostic plots were used to validate the results of the A-D and K-S tests as well as break any potential ties from seeing which imputed values from a given are more reasonable. For example the variable freshwater per capita from the Arab region had all five inputed values insignificantly different from the observed data when tested using the A-D and K-S tests. The box and whisker plots and density plots were then examined to learn more differences between imputation techniques. A suitable imputation technique would produce values that could be observed if the data had not been missing at all (Cite MICE Article page 42). The best performing plots had imputed data visually closest to the observed data. The diagnostic plots After applying applying the K-S and A-D statistical tests and inspecting the diagnostic plots, the imputation methods were decided for each variable in a given region. 
 
-```{r, xtable2, results='asis', eval=TRUE, cache=TRUE}
-load("C:/Users/ZKane/OneDrive/Documents/KaneThesis/healthy_convergence.RData")
-load("C:/Users/ZKane/OneDrive/Documents/KaneThesis/arab_imp.RData")
+```{r, xtable3, results='asis', eval=TRUE, cache=TRUE}
+load("C:/Users/ZKane/OneDrive/Documents/KaneThesis/completed_SE_asia.RData")
+load("C:/Users/ZKane/OneDrive/Documents/KaneThesis/completed_arab_imp.RData")
 load("C:/Users/ZKane/OneDrive/Documents/KaneThesis/SE_Asia_Mobile_imp.RData")
 
 methods_SE_asia <- data.frame(jm_SE_asia$method[which(jm_SE_asia$method != "")])
@@ -199,12 +230,40 @@ print(xtd2, comment = F, include.rownames=FALSE, scalebox = 0.8,
       sanitize.text.function = function(x){x}, table.placement = "H")
 ```
 
+### Imputation Challenges
+
+A problem that aross specifically with the South East Asia region is some variables are linearly related. When the MICE algorithm builds the regression equation to predict a missing value, a variable that is a linear combination of another will result in a singularity error that breaks the MICE algorithm. To fix this, the redundent variables must be excluded from the set of predictor variables used by MICE. The dependent variables can be identified by the last eigenvector of the covariance matrix of the data after performing listwise deletion. The variable Mobile Cell Subscriptions was highly correlated ($>0.5$) with multiple variables. Mobile Cell Subscriptions by far had the smallest loading ($2.012761e-11$) on the on the last eigenvector of the covariance matrix. For these reasons Mobile Cell Subscriptions was imputed individually using the MICE algorithm. When removed the singularity errors ceased to disrupt the MICE algorithm.  
+
+
 ## Regression Models
 
-With the complete data from the previous ten years since 2014, linear regression models were built for each variable of interest. Neumann's model's for regions in and out of conflict defined the  variable which would be of interest for this research. Each regression model was built with the goal of achieving the most parsimonium model from the other variables in the data. Before the regression models were build and reduced, the data set required certain variables utilized by Neumann's research be developed from the complete imputed data. Van Buuren stressed the importance of developing imputations before any additional variables are generated (CITE Van Buuren).  
+With the complete data from the previous ten years since 2014, linear regression models were built for each variable of interest. Neumann's model's for regions in and out of conflict defined the variable that would be of interest for this research. The variables required in Neumann's models will be required to predict future conflict transitions. The regression equations define each variable to be explained by the rest of the data. Each regression model was built with the goal of achieving the most parsimonium model from the other variables in the data. Before the regression models were build and reduced, the data set required certain variables utilized by Neumann's research be developed using the complete data set. Van Buuren stressed the importance of developing imputations before any additional variables are generated (CITE Van Buuren). Additionally certain variables that are derived from the rest of the data didn't require regressions to be build since their values in future scearios can be calculated then. 
 
-### Independent Variable Development
+### Variable Development
 
+After filling all the missing gaps in the data, variables of interested were developed to match the data set of previous works such as Neumann and Shellcross. A Government variable was created based on the values of the Polity variarble to indicate a nation's government type. The six categories of this variable are shown in Table XX.
+
+
+```{r, xtable4, results='asis', eval=FALSE}
+library(kableExtra)
+
+Government_mapping <- data.frame(
+  "Original Polity Value" = c("-10 to -6", "-5 to 5", "6 to 10", "-66", "-77", "-88"),
+  "Government Type Number"  = c(0,1,2,3,4,5))
+#   "Government Type" = c("Autocratic",
+#                         "Emerging Democracy",
+#                         "Democratic",
+#                         "Foreign Interruption",
+#                         "Anarchy",
+#                         "Transitional")
+# )
+
+#kableExtra::kable(Government_mapping, "latex", booktabs = T) %>%
+  #kable_styling(position = "center")
+government_table <- xtable::xtable(Government_mapping, caption = 'Goverment Type Mapping from Polity', label = 'table:gov_mapping')
+print(government_table, comment = F, include.rownames=FALSE, scalebox = 0.9, sanitize.text.function = function(x){x}, table.placement = "H")
+
+```
 
 
 ### Model Building Procedure
