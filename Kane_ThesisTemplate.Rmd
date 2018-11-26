@@ -148,12 +148,12 @@ Polity.transform <- data.frame(
   "Regime Type" = c("Central Ruling Party",
                   "Emerging, Transitional, Recent Change, and Disputed",
                   "Democratic"),
-  'Corresponding Polity Value'   = c(-10,0,10)
+  'Corresponding Polity Value'   = c('-10','0','10')
 )
 
 #kableExtra::kable(text_tbl, "latex", booktabs = T) %>%
 #  kable_styling(position = "center")
-methods_table <- xtable::xtable(Polity.transform, caption = 'Mapping of Regime Type to Fill Missing Polity Values', label = 'table:polity.tranform')
+methods_table <- xtable::xtable(Polity.transform, caption = 'Mapping of Regime Type to Fill Missing Polity Values', label = 'table:polity.tranform', align = "llc")
 print(methods_table, comment = F, include.rownames=FALSE, scalebox = 0.9, sanitize.text.function = function(x){x}, table.placement = "H")
 
 ```
@@ -241,36 +241,77 @@ With the complete data from the previous ten years since 2014, linear regression
 
 ### Variable Development
 
-After filling all the missing gaps in the data, variables of interested were developed to match the data set of previous works such as Neumann and Shellcross. A Government variable was created based on the values of the Polity variarble to indicate a nation's government type. The six categories of this variable are shown in Table XX.
+After filling all the missing gaps in the data, variables of interested were developed to match the data set of previous works such as Neumann and Shellcross. A Government variable was created based on the values of the Polity variarble to indicate a nation's government type. The six categories of this variable are shown in Table \@ref(tab:gov_mapping).
 
-
-```{r, xtable4, results='asis', eval=FALSE}
-library(kableExtra)
+```{r gov_mapping, xtable, results='asis', eval=TRUE}
 
 Government_mapping <- data.frame(
-  "Original Polity Value" = c("-10 to -6", "-5 to 5", "6 to 10", "-66", "-77", "-88"),
-  "Government Type Number"  = c(0,1,2,3,4,5))
-#   "Government Type" = c("Autocratic",
-#                         "Emerging Democracy",
-#                         "Democratic",
-#                         "Foreign Interruption",
-#                         "Anarchy",
-#                         "Transitional")
-# )
+  '1' = c("-10 to -6", "-5 to 5", "6 to 10", "-66", "-77", "-88"),
+  '2' = c('0','1','2','3','4','5'),
+  '3' = c("Autocratic",
+                         "Emerging Democracy",
+                         "Democratic",
+                         "Foreign Interruption",
+                         "Anarchy",
+                         "Transitional")
+)
 
-#kableExtra::kable(Government_mapping, "latex", booktabs = T) %>%
-  #kable_styling(position = "center")
-government_table <- xtable::xtable(Government_mapping, caption = 'Goverment Type Mapping from Polity', label = 'table:gov_mapping')
-print(government_table, comment = F, include.rownames=FALSE, scalebox = 0.9, sanitize.text.function = function(x){x}, table.placement = "H")
+#KableExtra::kable(Government_mapping, "latex", booktabs = T) %>%
+#  kable_styling(position = "center")
+government_table <- xtable::xtable(Government_mapping, caption = 'Goverment Type Mapping from Polity', label = 'tab:gov_mapping', align = "cccc")
+names(government_table) <- c("Original Polity Value", "Government Type Number",
+                             "Government Type")
+print(government_table, comment = F, include.rownames=FALSE, scalebox = 0.9,
+      sanitize.text.function = function(x){x}, table.placement = "H"
+      )
 
 ```
 
+The Percent Border Conflict is consistent with the percent border conflict variable in Neumann (CITE Neumann) and border conflict variable in Shallcross (CITE Shellcross) and Boekestein (CITE BOEK). The Percent Border Conflict is calculated by summing the product of all the percentages neighboring country border a country of interest and the neighboring countries HIIK level of conflict intensity for a given year. Islands were assumed to have no neighboring countries and a zero Percent Border Conflict. Equation XX defines the Percent Border Conflict Variable
+
+\begin{gather}
+PctBC_{ij} = \sum_{k=1}^{n} H_{kj}p_{k} \text{where} \nonumber\\
+n = \text{number of bordering countries for country $i$} \nonumber\\
+H_{kj} = \text{HIIK conflict intensity level for country $k$ in year $j$} \nonumber\\
+p_{k} = \text{percent of border country $i$ shares with county $k$} \\
+i = \text{Country} \in \{1,2, ..., 182\} \nonumber\\
+j = \text{Year} \in \{2004, ..., 2015\} \nonumber\\
+k = \text{Bordering country} \nonumber
+\end{gather}
+
+The Average Border Conflict measures the average conflict intensity around a given country in a given year and is consistent with Neumann's (CITE Neumann) average border conflict variable. Islands are treated as having no bordering countries. The calculation for the Average Border Conflict is defined by Equation XX. 
+
+\begin{gather}
+AvgBC_{ij} = \frac{\sum_{k=1}^{n} H_{kj}}{n} \text{where} \nonumber\\
+n = \text{number of bordering countries for country $i$} \nonumber\\
+H_{kj} = \text{HIIK conflict intensity level for country $k$ in year $j$} \\
+i = \text{Country} \in \{1,2, ..., 182\} \nonumber\\
+j = \text{Year} \in \{2004, ..., 2015\} \nonumber\\
+k = \text{Bordering country} \nonumber
+\end{gather}
+
+The Binary Border Conflict variable is consistent with the binary border conflict variable in both the Neumann (CITE Neumann) and Leiby (CITE Leiby) studies. It is a binary representation for a given country if one of their neighboring nations meets a certain conflict intensity in a given year. Islands are again assumed to have a zero score as they are not neighbored by any nations. Binary Border Conflict score is defined for a given country by Equation XX.
+
+\begin{gather}
+BinBC_{ij} = 
+  \begin{cases}
+    1 & \quad \text{if $H_{kj} \ge 3$ for any country bordering country $i$} \\
+    0 & \quad \text{otherwise}
+  \end{cases}
+\nonumber\\
+H_{kj} = \text{HIIK conflict intensity level for country $k$ in year $j$} \\
+i = \text{Country} \in \{1,2, ..., 182\} \nonumber\\
+j = \text{Year} \in \{2004, ..., 2015\} \nonumber\\
+k = \text{Bordering country} \nonumber
+\end{gather}
 
 ### Model Building Procedure
 
 
 
 ### Assessing Model Adequacy
+
+
 
 
 # Analysis And Results
