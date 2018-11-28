@@ -92,7 +92,9 @@ pacman::p_load(devtools,
                kableExtra,
                survminer,
                gridExtra,
-               png)
+               png,
+               grid,
+               Gmisc)
 source('scripts/R/setup.R')
 
 
@@ -115,7 +117,13 @@ library(kableExtra)
 
 ## Background
 
+Countries around the world have always entered in and out of conflict over time. To gain an understanding into these transitions, mdoels have been developed to predict when a country's conflict status will change. Variables have been identified that largely influence which direction a country moves. The Heidelberg Insititue for International Conflict Research (HIIK) has tracked conflict around the world and provided the data used for previous model building and this research. Using previously developed logistic regression models, this analsyis will investigate the nation specific Markov models for the probability of whether a state's conflict staus remains constant or changes. From these Markov models, the expected transition times, mean recurrence, and long-run time for each nation's conflict status can be found. 
+
+The Markov models alone provide forecasts into future conflict that go beyond the capabilites of logisitc regression. Manipulating each Markov model is the starting point for identifying future nation's conflict trends. 
+
 ## Problem Statement
+
+
 
 ## Research Objectives
 
@@ -127,13 +135,68 @@ library(kableExtra)
 
 # Literature Review
 
+## Overview
+
+The purpose of this chapter is to provide insight gained froms previous influential research done on country conflict prediction and understaning into the statistical methods practiced in this research's forecasting analysis.
+
 # Methodology
 
 ## Overview
 
-## Database
+This research explores imputation techniques to first fill missing gaps int the data and develop linear regression models to develop future alternatives of nation-state conflict for two major world regions. Section 3.2 describes the methodology used to develop the data set and imputation methods used to complete the data's missing observations. Section 3.3 outlines the development and building procedures for the linear regression models for each variable of interest. Section 3.4 
+
+```{r}
+grid.newpage()
+# set some parameters to use repeatedly
+leftx <- .15
+midx <- .5
+rightx <- .75
+width_med <- .25
+width_large <- .3
+gp <- gpar(fill = "lightgrey")
+textgp <- gpar(fontsize=10)
+# create boxes
+(start <- boxGrob("Process\n Original Data Set", 
+ x=leftx, y=.9, box_gp = gp,text_gp = textgp, width = width_med))
+??boxGrob
+(imp <- boxGrob("Imputation Selection\n and Implementation", 
+ x=midx, y=.9, box_gp = gp, width = width_large))
+# connect boxes like this
+connectGrob(start, imp, "horizontal")
+
+(reg_model <- boxGrob("Individual Variable\n Regression Model Generation", 
+ x=rightx, y=.9, box_gp = gp, width = width_large))
+# connect boxes like this
+connectGrob(imp, reg_model, "horizontal")
+
+(g1 <- boxGrob("Allocated to Group 1\n N = NNN", 
+ x=leftx, y=.5, box_gp = gp, width = width_med))
+(g2 <- boxGrob("Allocated to Group 2\n N = NNN", 
+ x=rightx, y=.5, box_gp = gp, width = width_med))
+
+connectGrob(imp, g1, "N")
+connectGrob(imp, g2, "N")
+
+(g11 <- boxGrob("Followed up\n N = NNN", 
+ x=leftx, y=.3, box_gp = gp, width = width_med))
+(g21 <- boxGrob("Followed up\n N = NNN", 
+ x=rightx, y=.3, box_gp = gp, width = width_med))
+
+connectGrob(g1, g11, "N")
+connectGrob(g2, g21, "N")
+
+(g12 <- boxGrob("Completed\n N = NNN", 
+ x=leftx, y=.1, box_gp = gp, width = width_med))
+(g22 <- boxGrob("Completed\n N = NNN", 
+ x=rightx, y=.1, box_gp = gp, width = width_med))
+
+connectGrob(g11, g12, "N")
+connectGrob(g21, g22, "N")
+```
 
 ## Imputation 
+
+###Data Set
 
 ### Missing Data
 
@@ -241,9 +304,9 @@ With the complete data from the previous ten years since 2014, linear regression
 
 ### Variable Development
 
-After filling all the missing gaps in the data, variables of interested were developed to match the data set of previous works such as Neumann and Shellcross. A Government variable was created based on the values of the Polity variarble to indicate a nation's government type. The six categories of this variable are shown in Table \@ref(tab:gov_mapping).
+After filling all the missing gaps in the data, variables of interested were developed to match the data set of previous works such as Neumann and Shellcross. A Government variable was created based on the values of the Polity variarble to indicate a nation's government type. The six categories of this variable are shown in Table \@ref(tab:govmapping).
 
-```{r gov_mapping, xtable, results='asis', eval=TRUE}
+```{r govmapping, xtable, results='asis', eval=TRUE}
 
 Government_mapping <- data.frame(
   '1' = c("-10 to -6", "-5 to 5", "6 to 10", "-66", "-77", "-88"),
@@ -267,8 +330,7 @@ print(government_table, comment = F, include.rownames=FALSE, scalebox = 0.9,
 
 ```
 
-The Percent Border Conflict is consistent with the percent border conflict variable in Neumann (CITE Neumann) and border conflict variable in Shallcross (CITE Shellcross) and Boekestein (CITE BOEK). The Percent Border Conflict is calculated by summing the product of all the percentages neighboring country border a country of interest and the neighboring countries HIIK level of conflict intensity for a given year. Islands were assumed to have no neighboring countries and a zero Percent Border Conflict. Equation XX defines the Percent Border Conflict Variable
-
+The Percent Border Conflict is consistent with the percent border conflict variable in Neumann (CITE Neumann) and border conflict variable in Shallcross (CITE Shellcross) and Boekestein (CITE BOEK). The Percent Border Conflict is calculated by summing the product of all the percentages neighboring country border a country of interest and the neighboring countries HIIK level of conflict intensity for a given year. Islands were assumed to have no neighboring countries and a zero Percent Border Conflict. Equation XX defines the Percent Border Conflict Variable 
 \begin{gather}
 PctBC_{ij} = \sum_{k=1}^{n} H_{kj}p_{k} \text{where} \nonumber\\
 n = \text{number of bordering countries for country $i$} \nonumber\\
@@ -280,7 +342,6 @@ k = \text{Bordering country} \nonumber
 \end{gather}
 
 The Average Border Conflict measures the average conflict intensity around a given country in a given year and is consistent with Neumann's (CITE Neumann) average border conflict variable. Islands are treated as having no bordering countries. The calculation for the Average Border Conflict is defined by Equation XX. 
-
 \begin{gather}
 AvgBC_{ij} = \frac{\sum_{k=1}^{n} H_{kj}}{n} \text{where} \nonumber\\
 n = \text{number of bordering countries for country $i$} \nonumber\\
@@ -291,7 +352,6 @@ k = \text{Bordering country} \nonumber
 \end{gather}
 
 The Binary Border Conflict variable is consistent with the binary border conflict variable in both the Neumann (CITE Neumann) and Leiby (CITE Leiby) studies. It is a binary representation for a given country if one of their neighboring nations meets a certain conflict intensity in a given year. Islands are again assumed to have a zero score as they are not neighbored by any nations. Binary Border Conflict score is defined for a given country by Equation XX.
-
 \begin{gather}
 BinBC_{ij} = 
   \begin{cases}
