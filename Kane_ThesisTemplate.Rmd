@@ -145,58 +145,80 @@ The purpose of this chapter is to provide insight gained froms previous influent
 
 This research explores imputation techniques to first fill missing gaps int the data and develop linear regression models to develop future alternatives of nation-state conflict for two major world regions. Section 3.2 describes the methodology used to develop the data set and imputation methods used to complete the data's missing observations. Section 3.3 outlines the development and building procedures for the linear regression models for each variable of interest. Section 3.4 
 
-```{r}
+```{r, eval = TRUE, fig.cap = "Methodology Overview", echo=FALSE}
+
 grid.newpage()
+grid::pushViewport(viewport(w = 1, h = 1))
+
 # set some parameters to use repeatedly
-leftx <- .15
-midx <- .5
-rightx <- .75
+leftx <- .13
+midx <- .48
+rightx <- .85
 width_med <- .25
 width_large <- .3
 gp <- gpar(fill = "lightgrey")
-textgp <- gpar(fontsize=10)
+gp_text <- gpar(fontsize = 9)
+
 # create boxes
 (start <- boxGrob("Process\n Original Data Set", 
- x=leftx, y=.9, box_gp = gp,text_gp = textgp, width = width_med))
-??boxGrob
+ x=leftx, y=.85, txt_gp = gp_text, box_gp = gp, width = width_med))
 (imp <- boxGrob("Imputation Selection\n and Implementation", 
- x=midx, y=.9, box_gp = gp, width = width_large))
-# connect boxes like this
-connectGrob(start, imp, "horizontal")
-
+ x=midx, y=.85, txt_gp = gp_text, box_gp = gp, width = width_large))
+# connect start to imp left to right horizontal
+connectGrob(start, imp, "horizontal", arrow_obj = getOption("connectGrobArrow",
+  default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
+#
 (reg_model <- boxGrob("Individual Variable\n Regression Model Generation", 
- x=rightx, y=.9, box_gp = gp, width = width_large))
-# connect boxes like this
-connectGrob(imp, reg_model, "horizontal")
+ x=rightx, y=.85, txt_gp = gp_text, box_gp = gp, width = width_large))
+# connect imp to reg_model left to right horizontal
+connectGrob(imp, reg_model, "horizontal", arrow_obj = getOption("connectGrobArrow",
+  default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
+# Big sweeping N connection back to left side
+(trend <- boxGrob("Set Trend\n of Variable of Interest", 
+ x=leftx, y=.5, txt_gp = gp_text, box_gp = gp, width = width_med))
+#
+connectGrob(reg_model, trend, "N", arrow_obj = getOption("connectGrobArrow",
+  default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
+# 
+(iterative_steps <- boxGrob("Single Step\n Iterative Forecasting Method", 
+ x=midx, y=.5, txt_gp = gp_text, box_gp = gp, width = width_large))
+# connect start to imp left to right horizontal
+connectGrob(trend, iterative_steps, "horizontal", arrow_obj = getOption("connectGrobArrow",
+  default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
+#
+(complete_data <- boxGrob("Complete\n Future Data", 
+ x=rightx, y=.5, txt_gp = gp_text, box_gp = gp, width = width_med))
+# connect imp to reg_model left to right horizontal
+connectGrob(iterative_steps, complete_data, "horizontal", 
+            arrow_obj = getOption("connectGrobArrow", 
+            default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
+# Big sweeping back to left side
+(logistic <- boxGrob("Utilize Developed\n Logisitc Regression Models", 
+ x=(leftx+0.02), y=0.15, txt_gp = gp_text, box_gp = gp, width = width_large))
+#
+connectGrob(complete_data, logistic, "N", arrow_obj = getOption("connectGrobArrow",
+  default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
+# 
+(markov <- boxGrob("Simulate Future\n Alternatives with Markov Model", 
+ x=(midx+.0275), y=0.15, txt_gp = gpar(fontsize = 8), box_gp = gp, width = width_large))
+# connect start to imp left to right horizontal
+connectGrob(logistic, markov, "horizontal", arrow_obj = getOption("connectGrobArrow",
+  default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
+#
+(analysis <- boxGrob("Analysis of\n Alternative Futures", 
+ x=(rightx), y=0.15, txt_gp = gp_text, box_gp = gp, width = width_med))
+# connect imp to reg_model left to right horizontal
+connectGrob(markov, analysis, "horizontal", 
+            arrow_obj = getOption("connectGrobArrow", 
+            default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
 
-(g1 <- boxGrob("Allocated to Group 1\n N = NNN", 
- x=leftx, y=.5, box_gp = gp, width = width_med))
-(g2 <- boxGrob("Allocated to Group 2\n N = NNN", 
- x=rightx, y=.5, box_gp = gp, width = width_med))
-
-connectGrob(imp, g1, "N")
-connectGrob(imp, g2, "N")
-
-(g11 <- boxGrob("Followed up\n N = NNN", 
- x=leftx, y=.3, box_gp = gp, width = width_med))
-(g21 <- boxGrob("Followed up\n N = NNN", 
- x=rightx, y=.3, box_gp = gp, width = width_med))
-
-connectGrob(g1, g11, "N")
-connectGrob(g2, g21, "N")
-
-(g12 <- boxGrob("Completed\n N = NNN", 
- x=leftx, y=.1, box_gp = gp, width = width_med))
-(g22 <- boxGrob("Completed\n N = NNN", 
- x=rightx, y=.1, box_gp = gp, width = width_med))
-
-connectGrob(g11, g12, "N")
-connectGrob(g21, g22, "N")
 ```
 
 ## Imputation 
 
-###Data Set
+### Original Data Set
+
+The data utilized by this study is the same as the Neumann (CITE Neumann) study and build upond the Leiby (CITE) and Shallcross (CITE) studies. The data initially consisted of 182 countries from the Neumann, Leiby, and Shallcross studies from the 2004-2014 and the same independent variables analyzed by the Neumann's research. This study still imputed and used the Military Expenditure as a percent of government spending despite Neumann (CITE) removing from her work because of a high percentage of the variable being unobserved. This research added the same two additional technology variables, two derived border conflcit variables inspired by the Leiby (CITE) research, and dependent conflict transition variable as the Neumann (CITE) study. These generated variables are explained in further detail after the missing data observations were first imputed.
 
 ### Missing Data
 
@@ -238,7 +260,6 @@ load("C:/Users/ZKane/OneDrive/Documents/KaneThesis/healthy_convergence.RData")
 
 After looking at MICE applied to this analysis's data and seeing previous research's MICE convergences, around 20 iterations there was sufficient convergence by the algorithm. Moving forward each imputation conducted was run for 20 iterations. MICE allows for several different imputation techniques to be specifically applied to each variable every pass. _m_ of these chains are calculated in parallel, and after around 15-20 iterations for one regression chain, the regression coefficents for each missing variables' models are likely to converge (CITE burren page 116). MICE utilizes the columns of fully observed data in these chains. Imputing with a subset of only the missing data or simplified data set may deprive the MICE algorithm of information from the observed data. For this reason, each imputation was performed with the missing and complete columns of data. Multiple imputation procedurely will impute the data, analyze each imputed dataset seperately, and pool the results. The intital imputation began with investigating which MICE method resulted in the data most similiar to the distribution of observed data. The five mice packages tested are shown in Table XX. 
 
-
 ```{r, xtable2, results='asis', eval=TRUE}
 library(kableExtra)
 
@@ -260,7 +281,6 @@ print(methods_table, comment = F, include.rownames=FALSE, scalebox = 0.9, saniti
 ```
 
 Between all of the six regions, there were average about 12 variables per region that required imputation by MICE. MICE has the ability to impute and utilize categorical varibales. MICE creates dummy variables for the categorical variables and generates their regressions and resulting imputations from these (CITE MICE R package). None of the variables requiring imputation were categorical, but there were categorical various such as Regime Type that were included in the prediction of other missing variables. The MICE imputation methods investigated were selected based on there not any missing categorical variables and trying to test a wide variety of methods. Imputation using classification and regression trees (CART) seek predictors and cut points in the predictors used to divide up the sample of data. The data is split up repeatidly until a binary tree is build to determine the target variable (CITE Van Buuren). CART methods for imputation are robust against outliers, can handle multicollinearity and skewed distributions, and are able to fit interations and nonlinear relationships (CITE Van Buuren). Predictive mean matching (pmm) is an imputation technique which utilizes the observed data to calculate the predicted target value. It takes a random draw from the candidate donors from the complete cases with predicted values closest to the predicted missing entry value (CITE Van Buuren). The norm method applies Bayesian linear regression that uses parameter uncertainty from random draws from a posterior probability distribution based on the observed data (CITE Van Buuren). 
-
 
 ### Testing Imputation Methods
 
@@ -364,6 +384,29 @@ i = \text{Country} \in \{1,2, ..., 182\} \nonumber\\
 j = \text{Year} \in \{2004, ..., 2015\} \nonumber\\
 k = \text{Bordering country} \nonumber
 \end{gather}
+
+The dependent variable, Conflict Transition, is a binary representation if a country has changed conflict status since the previous year. Conflcit status is defined by the mapping a country's HIIK conflict intensity level in a given year. HIIK scores of 0, 1, and 2 are mapped to a 0 for the conflict status and indicate a country is not in conflict that year. HIIK scores of 3, 4, and 5 are mapped to a conflict status of 1 and represent a country is in state of conflict in that given year. The Conflict Transition binary variable for a country in a given year depends on the current and previous years conflict status. Conflict Transition is equal to 1 if the conflict status of a given year _i_ is not equal to the conflict status of the previous year _i-1_. Table XX below represents this mapping from conflict status for years _i-1_ and _i_ to the binary Conflict Transition variable in year _i_. 
+
+```{r conflicttransitionmapping, xtable, results='asis', eval=TRUE}
+
+conflict_transition <- data.frame(
+  '1' = c("0 = Not In Conflict", "1 = In Conflict","0 = Not In Conflict", "1 = In Conflict"),
+  '2' = c("0 = Not In Conflict", "1 = In Conflict","1 = In Conflict","0 = Not In Conflict"),
+  '3' = c("0 = Not In Conflict", "0 = Not In Conflict","1 = In Conflict","1 = In Conflict")
+)
+
+#KableExtra::kable(Government_mapping, "latex", booktabs = T) %>%
+#  kable_styling(position = "center")
+conflict_transition_map <- xtable::xtable(conflict_transition, caption = 'Mapping of Conflict Transition', label = 'tab:conflict_transition_mapping', align = "ll|l|l")
+names(conflict_transition_map) <- c("Conflict Status Yr $i-1$", "Conflict Status Yr $i$",
+                             "Conflict Transition Yr $i$")
+bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
+print(conflict_transition_map, comment = F, include.rownames=FALSE, scalebox = 0.9,
+      sanitize.text.function = function(x){x}, table.placement = "H", hline.after = c(0,2),
+      sanitize.colnames.function = bold, booktabs = T
+      )
+
+```
 
 ### Model Building Procedure
 
