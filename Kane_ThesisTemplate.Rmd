@@ -160,7 +160,7 @@ gp <- gpar(fill = "lightgrey")
 gp_text <- gpar(fontsize = 9)
 
 # create boxes
-(start <- boxGrob("Process\n Original Data Set", 
+(start <- boxGrob("Collect\n Original Data Set", 
  x=leftx, y=.85, txt_gp = gp_text, box_gp = gp, width = width_med))
 (imp <- boxGrob("Imputation Selection\n and Implementation", 
  x=midx, y=.85, txt_gp = gp_text, box_gp = gp, width = width_large))
@@ -168,7 +168,7 @@ gp_text <- gpar(fontsize = 9)
 connectGrob(start, imp, "horizontal", arrow_obj = getOption("connectGrobArrow",
   default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
 #
-(reg_model <- boxGrob("Individual Variable\n Regression Model Generation", 
+(reg_model <- boxGrob("Individual Variable\n Regression Model Generation\n with Error Distributions", 
  x=rightx, y=.85, txt_gp = gp_text, box_gp = gp, width = width_large))
 # connect imp to reg_model left to right horizontal
 connectGrob(imp, reg_model, "horizontal", arrow_obj = getOption("connectGrobArrow",
@@ -180,13 +180,13 @@ connectGrob(imp, reg_model, "horizontal", arrow_obj = getOption("connectGrobArro
 connectGrob(reg_model, trend, "N", arrow_obj = getOption("connectGrobArrow",
   default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
 # 
-(iterative_steps <- boxGrob("Single Step\n Iterative Forecasting Method", 
+(iterative_steps <- boxGrob("Single Step\n Iterative Futures Method", 
  x=midx, y=.5, txt_gp = gp_text, box_gp = gp, width = width_large))
 # connect start to imp left to right horizontal
 connectGrob(trend, iterative_steps, "horizontal", arrow_obj = getOption("connectGrobArrow",
   default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
 #
-(complete_data <- boxGrob("Complete\n Future Data", 
+(complete_data <- boxGrob("Multiple Future\n Data Sets", 
  x=rightx, y=.5, txt_gp = gp_text, box_gp = gp, width = width_med))
 # connect imp to reg_model left to right horizontal
 connectGrob(iterative_steps, complete_data, "horizontal", 
@@ -243,6 +243,8 @@ print(methods_table, comment = F, include.rownames=FALSE, scalebox = 0.9, saniti
 
 ```
 
+Neumann's (CITE) research identified new groups of countries based on applying Modified K-Means Algorithm to the 2014 data for the selected 182 countries. The groupings found came from the algorithm's similiarities between data and location. Neumann's new groupings are how this study breaks down the 182 countries of interest, and her new COCOM 1 and 6 are the primary regions analyzed by this study. New COCOM 1 and 6 contain countries with historically violile conflict statuses which makes them of greater interest for analyzing future conflict transitions. 
+
 ### Mulitple Imputation by Chained Equations
 
 Multiple imputation by chained equations (MICE) was the method used to impute the remaining missing observations. The MICE package in R allowed this method to be applied to each multivariate data set of Neumann's six world regions (CITE Mice R Package). Multiple imputation creates _m_ > 1 complete versions of the data by filling the missing observations with plausible data values (CITE Buuren). Using multiple imputed data sets helps address the statistical uncertainity involved with impututing data. The MICE algorithm is a fully conditional specification imputation method which means it imputes multivariate missing data in a variable-by-variable manner (CITE Buuren). MICE predicts a column of missing data as a the target variable in a regression equation with the all the other variables as the predictors unless other specified (CITE R MICE package). If a predictor is missing an observation, then the most recent iteration's imputation value is used to impute the target variable (CITE MICE package). MICE is a Markov chain Monte Carlo method in which the state space consists of of all imputed values. The MICE algorithm must satisfy three properties to converge, just as any Markov chain would converge to a stationary distribution.
@@ -284,7 +286,7 @@ Between all of the six regions, there were average about 12 variables per region
 
 ### Testing Imputation Methods
 
-Each of the five MICE methods were run to develop five different imputed data sets and then compared using the Kolmogorov-Smirnov (K-S) and non-parametric, 2-sample Anderson-Darling (A-D) tests. The K-S test looks at if the imputed data values are similiar to the observed data values. This test makes the assumption that the imputed data should follow the same distribution as the observed data (CITE Abayomi, Brantley #36). Engmann and Cousineau (CITE Brantley 37) compared both the A-D and K-S tests and found that the A-D performed better when analzying moments and small differences in the tails of distributions. Based on these findings, the A-D test for this analysis will be the main differentitor between imputation methods (CITE Brantely). The null hypothesis behind both of these tests is that the distributions come from the same parent distribution. A small p value indicates that the imputed data and original data are significantly different and can be interepreted as a poor imputation method. For some variables missing a high percentage of observations such as Freshwater per Capita which was missing for ~74\% of observations, no imputation method was able to find a statistical similarity between that method's imputed data and the observed data.
+Each of the five MICE methods were run to develop five different imputed data sets per region and then compared using the Kolmogorov-Smirnov (K-S) and non-parametric, 2-sample Anderson-Darling (A-D) tests. The K-S test looks at if the imputed data values are similiar to the observed data values. This test makes the assumption that the imputed data should follow the same distribution as the observed data (CITE Abayomi, Brantley #36). Engmann and Cousineau (CITE Brantley 37) compared both the A-D and K-S tests and found that the A-D performed better when analzying moments and small differences in the tails of distributions. Based on these findings, the A-D test for this analysis will be the main differentitor between imputation methods (CITE Brantely). The null hypothesis behind both of these tests is that the distributions come from the same parent distribution. A small p value indicates that the imputed data and original data are significantly different and can be interepreted as a poor imputation method. For some variables missing a high percentage of observations such as Freshwater per Capita which was missing for ~74\% of observations, no imputation method was able to find a statistical similarity between that method's imputed data and the observed data.
 
 In some literature the mean absolute error and root mean square error have been used to assess the performance of an imputation method. This analysis didn't utilize these measures of accuracy based on the difference between true and the imputed data. Due to there being so few complete cases for certain variables, evaluation metrics that were based on knowing the true values for missing data weren't implemented. Van Buuren also detailed the shortcomings of treating imputation as a prediction problem geared towards finding the best value. The goal of multiple imputations is "to obtain statistically valid infrences from incomplete data" (CITE Van Buuren). Also treating imputations as methods to enhance the classification accuracy may favor strange imputation methods (CITE Van Buuren). For these reasons, evaluating and choosing an imputation method becomes an increasingly complex problem. Van Buuren's warning as well as the conflicting results and ties between the K-S and A-D statisitical tests begged for another imputation evaluation metric to decide the optimal method. Diagnostic graphs were implemented lastly to asses the plausibility of each imputation method: box and whisker plot and kernel density plots. The box and whisker plot was chosen over strip plots based on Van Buuren's recommendation that the box and whisker plot is more appropriate for large datasets. Both these plots compare the discrepancyies between the observed and imputed data. Dramatic differences would signify a possibility that something with the imputed data needed further investigating (CITE Van Buuren). The diagnostic plots were used to validate the results of the A-D and K-S tests as well as break any potential ties from seeing which imputed values from a given are more reasonable. For example the variable freshwater per capita from the Arab region had all five inputed values insignificantly different from the observed data when tested using the A-D and K-S tests. The box and whisker plots and density plots were then examined to learn more differences between imputation techniques. A suitable imputation technique would produce values that could be observed if the data had not been missing at all (Cite MICE Article page 42). The best performing plots had imputed data visually closest to the observed data. The diagnostic plots After applying applying the K-S and A-D statistical tests and inspecting the diagnostic plots, the imputation methods were decided for each variable in a given region. 
 
@@ -320,7 +322,7 @@ A problem that aross specifically with the South East Asia region is some variab
 
 ## Regression Models
 
-With the complete data from the previous ten years since 2014, linear regression models were built for each variable of interest. Neumann's model's for regions in and out of conflict defined the variable that would be of interest for this research. The variables required in Neumann's models will be required to predict future conflict transitions. The regression equations define each variable to be explained by the rest of the data. Each regression model was built with the goal of achieving the most parsimonium model from the other variables in the data. Before the regression models were build and reduced, the data set required certain variables utilized by Neumann's research be developed using the complete data set. Van Buuren stressed the importance of developing imputations before any additional variables are generated (CITE Van Buuren). Additionally certain variables that are derived from the rest of the data didn't require regressions to be build since their values in future scearios can be calculated then. 
+With the complete data from the previous ten years since 2014, linear regression models were built for each variable of interest. Neumann's model's for regions in and out of conflict defined the variable that would be of interest for this research. The variables required in Neumann's models will be required to predict future conflict transitions. The regression equations define each variable to be explained by the rest of the data. Each regression model was built with the goal of achieving the most parsimonium model from the other variables in the data. Before the regression models were build and reduced, the data set required certain variables gereated by Neumann's research be developed using the complete data. Van Buuren stressed the importance of developing imputations before any additional variables are generated (CITE Van Buuren). Additionally certain variables that are derived from the rest of the data didn't require regressions to be build since their values in future scearios can be calculated then. 
 
 ### Variable Development
 
@@ -410,11 +412,45 @@ print(conflict_transition_map, comment = F, include.rownames=FALSE, scalebox = 0
 
 ### Model Building Procedure
 
+Linear regression models were build for variables that were significant in Neumann's logisitic regression models that predict a country's Conflict Transition. Linear regression models were build to statistically define each individual variable of interest by the other variables in a given region. Testing was completed to include higher order terms and interaction terms in these models, but due to the higher achieved adjuste $R^2$ values, models were only build using the main effects. The complete data set used to build the models consists of all five of the imputed data sets stacked on top of each other. This goes against Van Buuren's advice to pool the resulting models, but due to the desire for point estimates defining each variable of interest, the simplier method of stacking the imputations was preferred. With less than $10\%$ of the observations missing from the two new world regions of interest, the research is impacted less from weight of the missing data. The stacked imputed data results in _m_ x _n_ complete records where _m_ still being the number of imputed data sets. The statistical analysis thus becomes a weighted linear regression with a weighted factor of $1/m$ applied to each record. Having low levels of missingness and the point estimates generated from the stacked complete data being unbiased (CITE page 158) makes treating the imputed data as a stacked, long data set sufficient for the purposes of this research.
 
+Stepwise regression is the primary method used to generate parsimonous linear regression models for each variable. This method iteratively removes predictor variables while computing a linear regression model each time. Each time a regression is rerun, each predictor variable's associated p value is assessed to see if it is within a specified acceptable range. By deleting variables from the model, the precision of point estimates of the remaining in the model are improved (CITE intro to linear). The stepwise method was run using JMP with chosen p value for entering and removing a variable of 0.05. Stepwise regression operates in a direction to either enter or remove a term with the smallest or largest p value. The mixed option in JMP alternates between a forward and backward selection to include the only significant terms. Models were building stepping from a null and full model using the mixed selection method. Most times the reduced models were the same, but if there were any differences, the model that achieved the higher $R^2_{adj}$ was chosen. The coefficient of multiple determination, $R^2$, is a measure of model adequacy that represents the proportion of variance explained by the regression. Adding regressors to the model will improve $R^2$ but can still produce a worse model and larger error mean square by losing one degree of freedom for error (CITE intro). A low value of $R^2$ for this research indicates a poorly specified model (CITE intro). $R^2$ will never decrease from adding a variable to the model, so it is important in varaibel selection to include another evaluation statistic. $R^2_{adj}$ will only improve if the variable added reduces the residual mean square to prevent overfitting (CITE intro). This research will reference to $R^2_{adj}$ when evaulating models in stepwise regression. Below are the stragey taken for variable selection and model building. The stategy is a modified version of the basic approach taken by Montgomery (CITE intro).
 
+```{r modelbuilding, xtable, results='asis', eval=TRUE}
+
+modelbuilding_steps <- data.frame(
+  '1' = c("1. Fit the main effects model to the data.",
+          "2. Perform a thorough analysis of each variable of interest's model",
+          "3. Determine if a transformation of the response or of some of the regressors is necessary.",
+          "4. Perform stepwise regression using a mixed forward-backward selection technique to generate",
+          "the model with the highest $R^2_{adj}$ and fewest significant variables.",
+          "5. Perform a thorough analysis of reduced model using graphical and statistical measures.",
+          "6. Explore the need for further transformations.")
+)
+
+#KableExtra::kable(Government_mapping, "latex", booktabs = T) %>%
+#  kable_styling(position = "center")
+library(xtable)
+modelbuilding_table <- xtable::xtable(modelbuilding_steps, label = 'tab:model_strat', align = "ll")
+names(modelbuilding_table) <- c('Strategy for Variable Selection and Model Building')
+bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
+print(modelbuilding_table, comment = F, include.rownames=FALSE, scalebox = 0.9,
+      sanitize.text.function = function(x){x}, table.placement = "H", sanitize.colnames.function = bold
+      )
+``` 
+  
 ### Assessing Model Adequacy
 
+The final stepwise models were analyzed to ensure they met all the assumptions of linear regression. Linear Regression assumes the error terms or residuals must be independent, normal, and random variables with mean of $0$ and constant variance $\sigma^2$ (CITE data mining and analysis). Graphically, these linear regression assumptions can be evaluated using a normal probability plot of the residuals and a plot of the standardized residuals against the predicted values. A normal probability plot of the residuals is a quantile-quantile plot where quantiles of a particular distribution are plotted against the quantiles of the standard normal distribution to identify deviations from normality (CITE data mining). If a distribution is normal then a majority of the points in the graph should form in a straight line. Statistically, deviations from normality can be tested using the Anderson-Darling test where the null hypothesis is that the data follows the normal distrubition. The package oslrr (CITE olsrr) in R was used to test if each variable of interests' residuals were normally distributed.
 
+A plot of the standardized residuals against the predicted values helps identify patterns in the variance of a model's residuals. Linear regression assumes homoscedasticity, constant variance, and independence of a model's error term. These plots tests both of these assumptions and should not represent any clear funnel, linear, or u-shaped pattern. The plots should be evenly spread out and distanced from the x-axis (CITE data mining). Statistically, these assumptions are tested using the Barlett's test for homogenity of variances from olsrr package (CITE olsrr) in R where the null hypothesis is that the variance is equal across groups. Below in Table XX the final models' adequacy tests can be found and any respective transformations.
+
+
+
+###Transformations
+
+
+## Variable Trending
 
 
 # Analysis And Results
