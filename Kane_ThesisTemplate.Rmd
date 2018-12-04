@@ -123,8 +123,6 @@ The Markov models alone provide forecasts into future conflict that go beyond th
 
 ## Problem Statement
 
-
-
 ## Research Objectives
 
 ## Research Questions
@@ -145,72 +143,38 @@ The purpose of this chapter is to provide insight gained froms previous influent
 
 This research explores imputation techniques to first fill missing gaps int the data and develop linear regression models to develop future alternatives of nation-state conflict for two major world regions. Section 3.2 describes the methodology used to develop the data set and imputation methods used to complete the data's missing observations. Section 3.3 outlines the development and building procedures for the linear regression models for each variable of interest. Section 3.4 
 
-```{r, eval = TRUE, fig.cap = "Methodology Overview", echo=FALSE}
+```{r, engine="tikz", eval = TRUE, fig.cap = "Methodology Overview", echo=FALSE}
 
-grid.newpage()
-grid::pushViewport(viewport(w = 1, h = 1))
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+text width=9em, text centered, rounded corners, minimum height=4em]
+#\tikzstyle{line} = [draw, -latex']
 
-# set some parameters to use repeatedly
-leftx <- .13
-midx <- .48
-rightx <- .85
-width_med <- .25
-width_large <- .3
-gp <- gpar(fill = "lightgrey")
-gp_text <- gpar(fontsize = 9)
+#\usetikzlibrary{arrows}
+\usetikzlibrary{arrows.meta}
+\tikzstyle{arrow} = [draw, >=angle 90, thick]
 
-# create boxes
-(start <- boxGrob("Collect\n Original Data Set", 
- x=leftx, y=.85, txt_gp = gp_text, box_gp = gp, width = width_med))
-(imp <- boxGrob("Imputation Selection\n and Implementation", 
- x=midx, y=.85, txt_gp = gp_text, box_gp = gp, width = width_large))
-# connect start to imp left to right horizontal
-connectGrob(start, imp, "horizontal", arrow_obj = getOption("connectGrobArrow",
-  default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
-#
-(reg_model <- boxGrob("Individual Variable\n Regression Model Generation\n with Error Distributions", 
- x=rightx, y=.85, txt_gp = gp_text, box_gp = gp, width = width_large))
-# connect imp to reg_model left to right horizontal
-connectGrob(imp, reg_model, "horizontal", arrow_obj = getOption("connectGrobArrow",
-  default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
-# Big sweeping N connection back to left side
-(trend <- boxGrob("Set Trend\n of Variable of Interest", 
- x=leftx, y=.5, txt_gp = gp_text, box_gp = gp, width = width_med))
-#
-connectGrob(reg_model, trend, "N", arrow_obj = getOption("connectGrobArrow",
-  default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
-# 
-(iterative_steps <- boxGrob("Single Step\n Iterative Futures Method", 
- x=midx, y=.5, txt_gp = gp_text, box_gp = gp, width = width_large))
-# connect start to imp left to right horizontal
-connectGrob(trend, iterative_steps, "horizontal", arrow_obj = getOption("connectGrobArrow",
-  default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
-#
-(complete_data <- boxGrob("Multiple Future\n Data Sets", 
- x=rightx, y=.5, txt_gp = gp_text, box_gp = gp, width = width_med))
-# connect imp to reg_model left to right horizontal
-connectGrob(iterative_steps, complete_data, "horizontal", 
-            arrow_obj = getOption("connectGrobArrow", 
-            default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
-# Big sweeping back to left side
-(logistic <- boxGrob("Utilize Developed\n Logisitc Regression Models", 
- x=(leftx+0.02), y=0.15, txt_gp = gp_text, box_gp = gp, width = width_large))
-#
-connectGrob(complete_data, logistic, "N", arrow_obj = getOption("connectGrobArrow",
-  default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
-# 
-(markov <- boxGrob("Simulate Future\n Alternatives with Markov Model", 
- x=(midx+.0275), y=0.15, txt_gp = gpar(fontsize = 8), box_gp = gp, width = width_large))
-# connect start to imp left to right horizontal
-connectGrob(logistic, markov, "horizontal", arrow_obj = getOption("connectGrobArrow",
-  default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
-#
-(analysis <- boxGrob("Analysis of\n Alternative Futures", 
- x=(rightx), y=0.15, txt_gp = gp_text, box_gp = gp, width = width_med))
-# connect imp to reg_model left to right horizontal
-connectGrob(markov, analysis, "horizontal", 
-            arrow_obj = getOption("connectGrobArrow", 
-            default = arrow(angle=25,type="closed", length = unit(0.15, "inches"))))
+\begin{tikzpicture}[node distance = 2cm, auto, >= triangle 60]
+    % nodes
+    \node [block] (init) {\Large Multiple Imputation of Multivariate Missing Data};
+    \node [block, right of = init, node distance = 5cm] (sec) {\Large Develop Regression Models Variables of Interest};
+    \node [block, right of = sec, node distance = 5cm] (third) {\Large Regression Model Analysis};
+    \node [block, below of = init, node distance = 3.5cm] (four) {\large Set Trend of Chosen Variable};
+    \node [block, right of = four, node distance = 5cm] (fifth) {\Large Derive One Step Forward using Regression Models};
+    \node [block, right of = fifth, node distance = 5cm] (six) {\Large Complete Future Data};
+    \node [block, below of = four, node distance = 3.5cm] (sev) {\Large Utilize Logistic Regression Models};
+    \node [block, right of = sev, node distance = 5cm] (eight) {\Large Simulate Results using Markov Model};
+    \node [block, right of = eight, node distance = 5cm] (nine) {\Large Analyze Alternative Futures};
+    
+    \path [line] (init) -- (sec);
+    \path [line] (sec) -- (third);
+    \path [line] (third) |- ([xshift = 0cm, yshift = -1.75cm].northwest) -- (four);
+    \path [line] (four) -- (fifth);
+    \path [line] (fifth) -- (six);
+    \path [line] (six) |- ([xshift = 0cm, yshift = -5.5cm].northwest) -- (sev);
+    \path [line] 
+      (sev) edge (eight)
+      (eight) edge (nine);
+\end{tikzpicture}
 
 ```
 
