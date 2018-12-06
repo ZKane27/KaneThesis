@@ -1,0 +1,110 @@
+---
+title: "Regression Models"
+author: "Zachary Kane"
+date: "November 28, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+
+```{r, echo=FALSE,warning=FALSE}
+#import data
+pacman::p_load(readxl,
+               caret,
+               leaps,
+               tidyverse,
+               dplyr,
+               olsrr,
+               nnet)
+Arab_final <- readxl::read_excel("Imputed Complete Long Data/Arab_final_expanded.xlsx")
+SE_Asia_Final <- readxl::read_excel("Imputed Complete Long Data/SE_Asia_final_expanded.xlsx")
+#colnames(Arab_final)
+Arab.cols <- c("index","Year","Mobile.Cell.Subs","Population.Density","Percent.Border.Conflict",
+               "Government.1","Government.3","Government.4","Government.5", "Fertility.Rate",
+               "Trade.percent.GDP", "Two.Year.Conflict.Intensity.Trend", "HIIK.Conflict.Intensity")
+Arab_reg <- Arab_final %>% dplyr::select_(.dots = Arab.cols)
+#library(xlsx)
+#xlsx::write.xlsx(Arab_reg, file = "Imputed Complete Long Data/Arab_reg_vars.xlsx")
+#colnames(Arab_reg)
+#colnames(SE_Asia_Final)
+SE_Asia.cols <- c("index","Year","Internet.Users","Life.Expectancy","Mobile.Cell.Subs",
+                  "Infant.Mortality.Rate",
+                  "Population.Growth","Arable.Lands","Average.Border.Conflict","Binary.Border.Conflict",
+                  "Freshwater.per.Capita","Two.Year.Conflict.Intensity.Trend","HIIK.Conflict.Intensity",
+                  "Military.Expend.GDP","Regime.Type.Democratic","Regime.Type.Emerging.Transitional",
+                  "Trade.percent.GDP","Freedom.Score","GDP.Per.Capita","Population.Density")
+SE_Asia_reg <- SE_Asia_Final %>% dplyr::select_(.dots = SE_Asia.cols)
+#write.csv(SE_Asia_reg, file = "Imputed Complete Long Data/SE_Asia_reg_vars.csv")
+```
+
+## Build Regression function
+
+### Arab Region
+
+```{r, warning=FALSE}
+Arab_reg$Government.1 <- as.factor(Arab_reg$Government.1)
+Arab_reg$Government.3 <- as.factor(Arab_reg$Government.3)
+Arab_reg$Government.4 <- as.factor(Arab_reg$Government.4)
+Arab_reg$Government.5 <- as.factor(Arab_reg$Government.5)
+Arab_reg$HIIK.Conflict.Intensity <- as.factor(Arab_reg$HIIK.Conflict.Intensity)
+```
+
+```{r,, warning=FALSE}
+attach(Arab_reg)
+Arab_Mobile.Cell.Subs_reg <- lm(log(Mobile.Cell.Subs)~HIIK.Conflict.Intensity+Population.Density+Government.1+Fertility.Rate+Percent.Border.Conflict+Trade.percent.GDP+Two.Year.Conflict.Intensity.Trend+Government.5+Government.3, data = Arab_reg)
+#
+Arab_Population.Density_reg <- lm(Population.Density~Fertility.Rate+Trade.percent.GDP+Percent.Border.Conflict+Mobile.Cell.Subs+HIIK.Conflict.Intensity+Government.1+Government.3+Government.4+Government.5+Two.Year.Conflict.Intensity.Trend+(Fertility.Rate*Trade.percent.GDP)+(Fertility.Rate*Percent.Border.Conflict)+(Fertility.Rate*HIIK.Conflict.Intensity)+(Fertility.Rate*Government.3)+(Trade.percent.GDP*Percent.Border.Conflict)+(Trade.percent.GDP*Mobile.Cell.Subs)+(Trade.percent.GDP*HIIK.Conflict.Intensity)+(Trade.percent.GDP*Government.1)+(Trade.percent.GDP*Government.3)+(Trade.percent.GDP*Government.4)+(Trade.percent.GDP*Government.5)+(Trade.percent.GDP*Two.Year.Conflict.Intensity.Trend)+(Percent.Border.Conflict*Mobile.Cell.Subs)+(Percent.Border.Conflict*HIIK.Conflict.Intensity)+(Percent.Border.Conflict*Government.1)+(Percent.Border.Conflict*Government.4)+(Percent.Border.Conflict*Two.Year.Conflict.Intensity.Trend)+(Mobile.Cell.Subs*HIIK.Conflict.Intensity)+(Mobile.Cell.Subs*Government.4)+(HIIK.Conflict.Intensity*Government.1)+(HIIK.Conflict.Intensity*Two.Year.Conflict.Intensity.Trend)+(Government.1*Two.Year.Conflict.Intensity.Trend)+(Government.5*Two.Year.Conflict.Intensity.Trend),data = Arab_reg)
+#
+Arab_Percent.Border.Conflict_reg <- lm(Percent.Border.Conflict~Fertility.Rate+Population.Density+Trade.percent.GDP+Mobile.Cell.Subs+HIIK.Conflict.Intensity+Government.1+Government.3+Government.4+(Government.5), data = Arab_reg)
+#
+Arab_Fertility.Rate_reg <- lm(Fertility.Rate~Population.Density+Trade.percent.GDP+Percent.Border.Conflict+Mobile.Cell.Subs+HIIK.Conflict.Intensity+Government.1+Government.3+Government.5+Two.Year.Conflict.Intensity.Trend, data = Arab_reg)
+#
+Arab_Trade.Percent.GDP_reg <- lm(Trade.percent.GDP~Fertility.Rate+Population.Density+Percent.Border.Conflict+Mobile.Cell.Subs+HIIK.Conflict.Intensity+Government.1+Government.3+Government.4+Government.5+Two.Year.Conflict.Intensity.Trend+(Fertility.Rate*Population.Density)+(Fertility.Rate*Percent.Border.Conflict)+(Fertility.Rate*Government.1)+(Population.Density*Mobile.Cell.Subs)+(Population.Density*Government.1)+(Population.Density*Government.3)+(Population.Density*Government.4)+(Population.Density*Two.Year.Conflict.Intensity.Trend)+(Percent.Border.Conflict*Mobile.Cell.Subs)+(Percent.Border.Conflict*HIIK.Conflict.Intensity)+(Percent.Border.Conflict*Government.1)+(Percent.Border.Conflict*Government.4)+(Percent.Border.Conflict*Two.Year.Conflict.Intensity.Trend)+(Mobile.Cell.Subs*Government.1)+(Mobile.Cell.Subs*Government.3)+(Mobile.Cell.Subs*Government.5)+(HIIK.Conflict.Intensity*Government.1)+(Government.1*Two.Year.Conflict.Intensity.Trend), data = Arab_reg)
+#
+Arab_HIIK.Conflcit.Intenstiy_reg <- nnet::multinom(HIIK.Conflict.Intensity~Mobile.Cell.Subs+Percent.Border.Conflict+Government.1+Fertility.Rate+Population.Density+Government.4+Trade.percent.GDP+Government.3+Two.Year.Conflict.Intensity.Trend+Government.5, data = Arab_reg)
+#
+detach(Arab_reg)
+```
+
+### SE Asia Region 
+
+```{r, warning=FALSE}
+SE_Asia_reg$Binary.Border.Conflict <- as.factor(SE_Asia_reg$Binary.Border.Conflict)
+SE_Asia_reg$HIIK.Conflict.Intensity <- as.factor(SE_Asia_reg$HIIK.Conflict.Intensity)
+SE_Asia_reg$Regime.Type.Democratic <- as.factor(SE_Asia_reg$Regime.Type.Democratic)
+SE_Asia_reg$Regime.Type.Emerging.Transitional <- as.factor(SE_Asia_reg$Regime.Type.Emerging.Transitional)
+```
+
+```{r, warning=FALSE}
+attach(SE_Asia_reg)
+#
+SE_Asia_Internet.Users_reg <- lm(Internet.Users~GDP.Per.Capita+Trade.percent.GDP+Mobile.Cell.Subs+Population.Density+Infant.Mortality.Rate+Arable.Lands+Military.Expend.GDP+HIIK.Conflict.Intensity+Freedom.Score+Average.Border.Conflict+Regime.Type.Democratic+Life.Expectancy+Regime.Type.Emerging.Transitional+Binary.Border.Conflict+Freshwater.per.Capita, data = SE_Asia_reg)
+#
+SE_Asia_Life.Expectancy_reg <- lm(Life.Expectancy~Infant.Mortality.Rate+Freshwater.per.Capita+Regime.Type.Emerging.Transitional+HIIK.Conflict.Intensity+Freedom.Score+Internet.Users+Regime.Type.Democratic+GDP.Per.Capita+Average.Border.Conflict+Population.Density+Military.Expend.GDP+Binary.Border.Conflict+Trade.percent.GDP+Arable.Lands, data = SE_Asia_reg)
+#
+
+```
+
+## Model Testing
+
+### Arab Region
+
+```{r}
+
+olsrr::ols_test_normality(Arab_Trade.Percent.GDP_reg)
+olsrr::ols_plot_resid_fit(Arab_Trade.Percent.GDP_reg)
+olsrr::ols_test_f(Arab_Mobile.Cell.Subs_reg)
+
+  
+```
+
+### SE Asia Region
+
+
+
+1. [Explains homoscedasticity tests in R](https://cran.r-project.org/web/packages/olsrr/vignettes/heteroskedasticity.html)
+2. [Explains normality tests  in R](https://cran.r-project.org/web/packages/olsrr/vignettes/residual_diagnostics.html)
+
