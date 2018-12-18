@@ -123,9 +123,22 @@ The Markov models alone provide forecasts into future conflict that go beyond th
 
 ## Problem Statement
 
+Fill the missing observations in the data set utilized by Neumann's research with optimal imutation methods. Develop regression models for the Neumann's selected variables of interest in the Arab and South East Asia regions. Iteratively create future alternative scenarios for country transitions in and out of conflict. 
+
 ## Research Objectives
 
+The objective of this study is to see how future alternatives of country conflict will look using an interative method based on a modified Bayesian multiple imputations. 
+
 ## Research Questions
+
+This study seeks to answer the following research questions on the future conflict scenarios for the Arab and South East world regions. 
+
+**Question 1**
+
+How should the data set utilized in the Neumann study be imputed?
+
+
+
 
 ## Assumptions and Limitations
 
@@ -137,13 +150,23 @@ The Markov models alone provide forecasts into future conflict that go beyond th
 
 The purpose of this chapter is to provide insight gained froms previous influential research done on country conflict prediction and understaning into the statistical methods practiced in this research's forecasting analysis.
 
+## Nation-State Conflict Prediction Models
+
+Predicting world conflict has been a problem addressed by multiple studies. There have been different prediction methologies and ways researchers have defined conflict or the relevant variables. There have been varying accuracies these predictive models have achieved. This section outlines the current progress already made on predicting that will be the basis of this researches work on alternative future analysis of world conflict.
+
+The study, _A Global Forecasting Model of Political Instability_, conducted by Dr. Jack Goldstone for the U.S. Central Intelligence Agency's Directorate of Intelligence predicted the onset of political instability two years prior to the conflict's start (CITE Goldstone). The research took open source global data from 1955 to 2003 and performed a variety of prediction techniques with an achieved high, 80\% accuracy distinguishing between countries that experienced instability from those that remained stable (CITE Goldstone). The study found a nonlinear five-category measure of regime type to be the most powerful predictor rather than economic conditions, demography, or geography (CITE Goldstone). Conflict, the dependent variable, was defined by the study as a Revolutionary War, Ethnic War, Adverse Regime Changes, or Genocides and Politicides (CITE Goldstone). Of the predictive event history models, logistic regression, neural networks, and Markov processess tested, the simple logisitc regression model performed best with only four independent variables. These results gave insight for future researchs to the importance of fewer, major variables in conflict models as well as logistic regression being a favorable method political instability prediction.
+
+
+
+## Bayesian Forecasting
+
 # Methodology
 
 ## Overview
 
 This research explores imputation techniques to first fill missing gaps int the data and develop linear regression models to develop future alternatives of nation-state conflict for two major world regions. Section 3.2 describes the methodology used to develop the data set and imputation methods used to complete the data's missing observations. Section 3.3 outlines the development and building procedures for the linear regression models for each variable of interest. Section 3.4 
 
-```{r, engine="tikz", eval = TRUE, fig.cap = "Methodology Overview", echo=FALSE}
+```{r, engine="tikz", eval = TRUE, fig.cap = "Methodology Overview", echo=FALSE, fig.width=30, fig.height=30}
 
 \tikzstyle{block} = [rectangle, draw, fill=blue!20, 
 text width=9em, text centered, rounded corners, minimum height=4em]
@@ -378,43 +401,44 @@ print(conflict_transition_map, comment = F, include.rownames=FALSE, scalebox = 0
 
 Linear regression models were build for variables that were significant in Neumann's logisitic regression models that predict a country's Conflict Transition. Linear regression models were build to statistically define each individual variable of interest by the other variables in a given region. Testing was completed to include higher order terms and interaction terms in these models, but due to the higher achieved adjuste $R^2$ values, models were only build using the main effects. The complete data set used to build the models consists of all five of the imputed data sets stacked on top of each other. This goes against Van Buuren's advice to pool the resulting models, but due to the desire for point estimates defining each variable of interest, the simplier method of stacking the imputations was preferred. With less than $10\%$ of the observations missing from the two new world regions of interest, the research is impacted less from weight of the missing data. The stacked imputed data results in _m_ x _n_ complete records where _m_ still being the number of imputed data sets. The statistical analysis thus becomes a weighted linear regression with a weighted factor of $1/m$ applied to each record. Having low levels of missingness and the point estimates generated from the stacked complete data being unbiased (CITE page 158) makes treating the imputed data as a stacked, long data set sufficient for the purposes of this research.
 
-Stepwise regression is the primary method used to generate parsimonous linear regression models for each variable. This method iteratively removes predictor variables while computing a linear regression model each time. Each time a regression is rerun, each predictor variable's associated p value is assessed to see if it is within a specified acceptable range. By deleting variables from the model, the precision of point estimates of the remaining in the model are improved (CITE intro to linear). The stepwise method was run using JMP with chosen p value for entering and removing a variable of 0.05. Stepwise regression operates in a direction to either enter or remove a term with the smallest or largest p value. The mixed option in JMP alternates between a forward and backward selection to include the only significant terms. Models were building stepping from a null and full model using the mixed selection method. Most times the reduced models were the same, but if there were any differences, the model that achieved the higher $R^2_{adj}$ was chosen. The coefficient of multiple determination, $R^2$, is a measure of model adequacy that represents the proportion of variance explained by the regression. Adding regressors to the model will improve $R^2$ but can still produce a worse model and larger error mean square by losing one degree of freedom for error (CITE intro). A low value of $R^2$ for this research indicates a poorly specified model (CITE intro). $R^2$ will never decrease from adding a variable to the model, so it is important in varaibel selection to include another evaluation statistic. $R^2_{adj}$ will only improve if the variable added reduces the residual mean square to prevent overfitting (CITE intro). This research will reference to $R^2_{adj}$ when evaulating models in stepwise regression. Below are the stragey taken for variable selection and model building. The stategy is a modified version of the basic approach taken by Montgomery (CITE intro).
-
-```{r modelbuilding, xtable, results='asis', eval=TRUE}
-
-modelbuilding_steps <- data.frame(
-  '1' = c("1. Fit the main effects model to the data.",
-          "2. Perform a thorough analysis of each variable of interest's model",
-          "3. Determine if a transformation of the response or of some of the regressors is necessary.",
-          "4. Perform stepwise regression using a mixed forward-backward selection technique to generate",
-          "the model with the highest $R^2_{adj}$ and fewest significant variables.",
-          "5. Perform a thorough analysis of reduced model using graphical and statistical measures.",
-          "6. Explore the need for further transformations.")
-)
-
-#KableExtra::kable(Government_mapping, "latex", booktabs = T) %>%
-#  kable_styling(position = "center")
-library(xtable)
-modelbuilding_table <- xtable::xtable(modelbuilding_steps, label = 'tab:model_strat', align = "ll")
-names(modelbuilding_table) <- c('Strategy for Variable Selection and Model Building')
-bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
-print(modelbuilding_table, comment = F, include.rownames=FALSE, scalebox = 0.9,
-      sanitize.text.function = function(x){x}, table.placement = "H", sanitize.colnames.function = bold
-      )
-``` 
+Stepwise regression is the primary method used to generate parsimonous linear regression models for each variable. This method iteratively removes predictor variables while computing a linear regression model each time. Each time a regression is rerun, each predictor variable's associated p value is assessed to see if it is within a specified acceptable range. By deleting variables from the model, the precision of point estimates of the remaining in the model are improved (CITE intro to linear). The stepwise method was run using JMP with chosen p value for entering and removing a variable of 0.05. Stepwise regression operates in a direction to either enter or remove a term with the smallest or largest p value. The mixed option in JMP alternates between a forward and backward selection to include the only significant terms. Models were building stepping from a null and full model using the mixed selection method. Most times the reduced models were the same, but if there were any differences, the model that achieved the higher $R^2_{adj}$ was chosen. The coefficient of multiple determination, $R^2$, is a measure of model adequacy that represents the proportion of variance explained by the regression. Adding regressors to the model will improve $R^2$ but can still produce a worse model and larger error mean square by losing one degree of freedom for error (CITE intro). A low value of $R^2$ for this research indicates a poorly specified model (CITE intro). $R^2$ will never decrease from adding a variable to the model, so it is important in varaibel selection to include another evaluation statistic. $R^2_{adj}$ will only improve if the variable added reduces the residual mean square to prevent overfitting (CITE intro). This research will reference to $R^2_{adj}$ when evaulating models in stepwise regression. Interaction terms were also selectively included in models with lacking $R^2_{adj}$ (<0.5). In an effort to devleop parsimonious models, only second order interaction terms were considered. With the interactions factored into the model, the Arab region produced 74 possible variables while there were 209 possible variables in the SE Asia region. Stepwise regression reduced these numbers for the models requiring higher $R^2_{adj}$. All of the Arab region models were built with interactions, but only Population Growth's interactions were necessary in South East Asia.
   
 ### Assessing Model Adequacy
 
-The final stepwise models were analyzed to ensure they met all the assumptions of linear regression. Linear Regression assumes the error terms or residuals must be independent, normal, and random variables with mean of $0$ and constant variance $\sigma^2$ (CITE data mining and analysis). Graphically, these linear regression assumptions can be evaluated using a normal probability plot of the residuals and a plot of the standardized residuals against the predicted values. A normal probability plot of the residuals is a quantile-quantile plot where quantiles of a particular distribution are plotted against the quantiles of the standard normal distribution to identify deviations from normality (CITE data mining). If a distribution is normal then a majority of the points in the graph should form in a straight line. Statistically, deviations from normality can be tested using the Anderson-Darling test where the null hypothesis is that the data follows the normal distrubition. The package oslrr (CITE olsrr) in R was used to test if each variable of interests' residuals were normally distributed.
+The final stepwise models were analyzed to ensure they met all the assumptions of linear regression. Linear Regression assumes the error terms or residuals must be independent, normal, and random variables with mean of $0$ and constant variance $\sigma^2$ (CITE data mining and analysis). Graphically, these linear regression assumptions can be evaluated using a normal probability plot of the residuals and a plot of the standardized residuals against the predicted values. A normal probability plot of the residuals is a quantile-quantile plot where quantiles of a particular distribution are plotted against the quantiles of the standard normal distribution to identify deviations from normality (CITE data mining). If a distribution is normal then a majority of the points in the graph should fall close to the diagonal reference line. Statistically, there are lot of different ways to test normality with each depending on the data at hand. The deviations from normality were calculated using the Cramer-Von Mises test where the null hypothesis is that the distribution of the errors follows a normal distrubition. It is a simplified version of the Anderson-Darling test that does not provide as much weight to the tails of the distribution. It is not the most powerful empirical distribution test, but this research choose to have more relaxed normality standards to avoid conducted more in depth outlier analysis and accept simplier models sooner. The Cramer-Von Mises statistic is calculated as,
+\begin{gather}
+CVM = \frac{1}{12n} + \sum_{i=1}^{n} [F_0(x_{(i)})-\frac{2i-1}{2n}]^2
+\end{gather}
+where $n$ is the sample size and $x_i$'s are the ordered data (CITE CVM). P value scores lower than $0.05$ indicate a regression model's errors don't follow a normally distrbuted. The package oslrr (CITE olsrr) in R was used to test the normality of each variable of interests' residuals.
 
-A plot of the standardized residuals against the predicted values helps identify patterns in the variance of a model's residuals. Linear regression assumes homoscedasticity, constant variance, and independence of a model's error term. These plots tests both of these assumptions and should not represent any clear funnel, linear, or u-shaped pattern. The plots should be evenly spread out and distanced from the x-axis (CITE data mining). Statistically, these assumptions are tested using the Barlett's test for homogenity of variances from olsrr package (CITE olsrr) in R where the null hypothesis is that the variance is equal across groups. Below in Table XX the final models' adequacy tests can be found and any respective transformations.
+A plot of the standardized residuals against the predicted values helps identify patterns in the variance of a model's residuals. Linear regression assumes homoscedasticity, constant variance, and independence of a model's error term. These plots tests both of these assumptions and should not represent any clear funnel, linear, or u-shaped pattern. If the variance of the errors is increasing or decreasing over time, confidence intervals for new predictions will tend to be unrealistic (CITE DUKE). The plots should be evenly spread out and distanced from the x-axis (CITE data mining). Statistically, these assumptions are tested using the Breusch Pagan test for homogenity of variances from the olsrr package (CITE olsrr) in R where the null hypothesis is that the variance is constant based on a chi-squared test. This test sees whether the variance of the errors from a regression is dependent on the values of the independent variables (CITE cran heter). Below in Table XX the final models' adequacy tests can be found and any respective transformations.
 
+```{r modeladeqarab, xtable, results='asis', eval=TRUE}
 
+load("C:/Users/ZKane/OneDrive/Documents/KaneThesis/Arab_reg_table.Rda")
+load("C:/Users/ZKane/OneDrive/Documents/KaneThesis/SE_Asia_reg_table.Rda")
+reg_table <- rbind (Arab_reg_table, SE_Asia_reg_table)
+reg_table[c(2,4,6,8:10,12,13),5] <- "<0.0001"
+reg_map <- xtable::xtable(reg_table, caption = 'Regression Model Adequacy Check', label = 'tab:reg_models', align = "lcccccc", digits=c(0,4,4,4,4,4,4))
 
-###Transformations
+names(reg_map) <- c("$R^2$", "$R^2_{adj}$", "F-Test",
+                             "Cramer-Von Mises", "Normality", "Transformation")
+rownames(reg_map) <- c("Arab Mobile Cell Subscriptions","Arab Population Density","Arab Percent Border Conflict","Arab Fertility Rate","Arab Trade Percent GDP","SE Asia Internet Users","SE Asia Life Expectancy","SE Asia Mobile Cell Subs","SE Infant Mortality Rate","SE Asia Population Growth","SE Asia Arable Lands","SE Asia Avg Border Conflict", "SE Asia Freshwater per Capita")
+#bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
+print(reg_map, comment = F, scalebox = 0.75,
+      sanitize.text.function = function(x){x}, table.placement = "H",
+      booktabs = T, include.rownames = TRUE
+      )
 
+```
 
-## Variable Trending
+### Transformations
+
+Certain variables regression models were improved after the dependent variarbles were transformed. These transformations were performed to possible improved the model's $R^2_{adj}$, normality, or homoscedasticity statistics. If a transformation tested raised any of these categories, then the transformation was made for model from here on out. The square root was taken for the Population Density variable in the Arab region ($\sqrt{Population Density}$). The transformation improved a higher $R^2_{adj}$ but didn't improve the model's homoscedasticity or nomarlity violations. The log was taken of a few variables which helped some of those models to fulfill the linear regression assumptions ($log(y_i)=\beta_0+\beta_{1}x_{1i}+...+\beta_kx_{ki}+e_i$). Mobile Cell Subscriptions in the South East Asia region was transformed initally just by the square root, but the model continued to improve further by then taking the fourth root ($\sqrt[4]{Mobile Cell Subscriptions}$). JMP offered other transformations that were tested but didn't out perform the three ones (log, square root, and fourth root) that were actually done. 
+
+Even after the transformations were added, the regression models didn't statistically meet all of the assumptions of linear regression. This research recognizes the discrepencies in the models, but accepts the models, and will proceed with them for developing future alternatives of world conflict. 
+
+## Iterative Forecasting 
 
 
 # Analysis And Results
@@ -424,3 +448,15 @@ This is the fourth chapter of your thesis
 # Conclusion
 
 This is the final chapter of your thesis.
+
+
+
+
+
+
+
+
+
+
+
+
