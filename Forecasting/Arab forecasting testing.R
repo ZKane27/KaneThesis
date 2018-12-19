@@ -1,0 +1,294 @@
+#
+#
+#
+# Arab Forecasting Testing
+# 18 Dec
+
+# Read in the Arab data
+
+#import data
+pacman::p_load(readxl,
+               caret,
+               leaps,
+               tidyverse,
+               dplyr,
+               olsrr,
+               nnet)
+suppressWarnings(expr)
+Arab_final <- readxl::read_excel("Imputed Complete Long Data/Arab_final_expanded.xlsx")
+
+Arab.cols <- c("index","Year","Mobile.Cell.Subs","Population.Density","Percent.Border.Conflict",
+               "Government.1","Government.3","Government.4","Government.5", "Fertility.Rate",
+               "Trade.percent.GDP", "Two.Year.Conflict.Intensity.Trend", "HIIK.Conflict.Intensity")
+
+Arab_forecast <- Arab_final %>% dplyr::select_(.dots = Arab.cols)
+
+# Fix Factor Variables
+
+Arab_forecast$Government.1 <- as.factor(Arab_forecast$Government.1)
+Arab_forecast$Government.3 <- as.factor(Arab_forecast$Government.3)
+Arab_forecast$Government.4 <- as.factor(Arab_forecast$Government.4)
+Arab_forecast$Government.5 <- as.factor(Arab_forecast$Government.5)
+Arab_forecast$HIIK.Conflict.Intensity <- as.factor(Arab_forecast$HIIK.Conflict.Intensity)
+
+# Build Regression Models 
+
+attach(Arab_forecast)
+Arab_Mobile.Cell.Subs_reg <- lm(log(Mobile.Cell.Subs)~HIIK.Conflict.Intensity+Population.Density+Government.1+Fertility.Rate+Percent.Border.Conflict+Trade.percent.GDP+Two.Year.Conflict.Intensity.Trend+Government.5+Government.3, data = Arab_forecast)
+#
+Arab_Population.Density_reg <- lm((Population.Density^(1/2))~Fertility.Rate+Trade.percent.GDP+Percent.Border.Conflict+Mobile.Cell.Subs+HIIK.Conflict.Intensity+Government.1+Government.3+Government.4+Government.5+Two.Year.Conflict.Intensity.Trend+(Fertility.Rate*Trade.percent.GDP)+(Fertility.Rate*Percent.Border.Conflict)+(Fertility.Rate*HIIK.Conflict.Intensity)+(Fertility.Rate*Government.3)+(Trade.percent.GDP*Percent.Border.Conflict)+(Trade.percent.GDP*Mobile.Cell.Subs)+(Trade.percent.GDP*HIIK.Conflict.Intensity)+(Trade.percent.GDP*Government.1)+(Trade.percent.GDP*Government.3)+(Trade.percent.GDP*Government.4)+(Trade.percent.GDP*Government.5)+(Trade.percent.GDP*Two.Year.Conflict.Intensity.Trend)+(Percent.Border.Conflict*Mobile.Cell.Subs)+(Percent.Border.Conflict*HIIK.Conflict.Intensity)+(Percent.Border.Conflict*Government.1)+(Percent.Border.Conflict*Government.4)+(Percent.Border.Conflict*Two.Year.Conflict.Intensity.Trend)+(Mobile.Cell.Subs*HIIK.Conflict.Intensity)+(Mobile.Cell.Subs*Government.4)+(HIIK.Conflict.Intensity*Government.1)+(HIIK.Conflict.Intensity*Two.Year.Conflict.Intensity.Trend)+(Government.1*Two.Year.Conflict.Intensity.Trend)+(Government.5*Two.Year.Conflict.Intensity.Trend),data = Arab_forecast)
+#
+Arab_Percent.Border.Conflict_reg <- lm(Percent.Border.Conflict~Fertility.Rate+Population.Density+Trade.percent.GDP+Mobile.Cell.Subs+HIIK.Conflict.Intensity+Government.1+Government.3+Government.4+Government.5+Two.Year.Conflict.Intensity.Trend+(Fertility.Rate*Population.Density)+(Fertility.Rate*Trade.percent.GDP)+(Fertility.Rate*Mobile.Cell.Subs)+(Fertility.Rate*HIIK.Conflict.Intensity)+(Fertility.Rate*Government.3)+(Population.Density*Mobile.Cell.Subs)+(Population.Density*HIIK.Conflict.Intensity)+(Population.Density*Government.1)+(Population.Density*Government.4)+(Trade.percent.GDP*Mobile.Cell.Subs)+(Trade.percent.GDP*HIIK.Conflict.Intensity)+(Trade.percent.GDP*Government.1)+(Trade.percent.GDP*Government.4)+(Mobile.Cell.Subs*HIIK.Conflict.Intensity)+(Mobile.Cell.Subs*Government.1)+(HIIK.Conflict.Intensity*Government.1)+(HIIK.Conflict.Intensity*Government.3)+(HIIK.Conflict.Intensity*Government.4)+(HIIK.Conflict.Intensity*Government.5)+(HIIK.Conflict.Intensity*Two.Year.Conflict.Intensity.Trend), data = Arab_forecast)
+#
+Arab_Fertility.Rate_reg <- lm(Fertility.Rate~Population.Density+Trade.percent.GDP+Percent.Border.Conflict+Mobile.Cell.Subs+HIIK.Conflict.Intensity+Government.1+Government.3+Government.4+Government.5+Two.Year.Conflict.Intensity.Trend+(Population.Density*Trade.percent.GDP)+(Population.Density*Percent.Border.Conflict)+(Population.Density*Mobile.Cell.Subs)+(Population.Density*HIIK.Conflict.Intensity)+(Population.Density*Government.3)+(Population.Density*Government.4)+(Population.Density*Government.5)+(Population.Density*Two.Year.Conflict.Intensity.Trend)+(Trade.percent.GDP*Percent.Border.Conflict)+(Trade.percent.GDP*Mobile.Cell.Subs)+(Trade.percent.GDP*HIIK.Conflict.Intensity)+(Trade.percent.GDP*Government.1)+(Percent.Border.Conflict*Mobile.Cell.Subs)+(Percent.Border.Conflict*HIIK.Conflict.Intensity)+(Percent.Border.Conflict*Government.1)+(Percent.Border.Conflict*Government.5)+(Mobile.Cell.Subs*HIIK.Conflict.Intensity)+(Mobile.Cell.Subs*Government.1)+(HIIK.Conflict.Intensity*Government.1), data = Arab_forecast)
+#
+Arab_Trade.Percent.GDP_reg <- lm(Trade.percent.GDP~Fertility.Rate+Population.Density+Percent.Border.Conflict+Mobile.Cell.Subs+HIIK.Conflict.Intensity+Government.1+Government.3+Government.4+Government.5+Two.Year.Conflict.Intensity.Trend+(Fertility.Rate*Population.Density)+(Fertility.Rate*Percent.Border.Conflict)+(Fertility.Rate*Government.1)+(Population.Density*Mobile.Cell.Subs)+(Population.Density*Government.1)+(Population.Density*Government.3)+(Population.Density*Government.4)+(Population.Density*Two.Year.Conflict.Intensity.Trend)+(Percent.Border.Conflict*Mobile.Cell.Subs)+(Percent.Border.Conflict*HIIK.Conflict.Intensity)+(Percent.Border.Conflict*Government.1)+(Percent.Border.Conflict*Government.4)+(Percent.Border.Conflict*Two.Year.Conflict.Intensity.Trend)+(Mobile.Cell.Subs*Government.1)+(Mobile.Cell.Subs*Government.3)+(Mobile.Cell.Subs*Government.5)+(HIIK.Conflict.Intensity*Government.1)+(Government.1*Two.Year.Conflict.Intensity.Trend), data = Arab_forecast)
+detach(Arab_forecast)
+# Generate Conflict Status Binary Var
+Conflict_Status <- ifelse(as.numeric(as.character(Arab_forecast$HIIK.Conflict.Intensity)) >= 3, 1, 0)
+Arab_forecast$Conflict_Status <- Conflict_Status
+#
+# Define conversion equation from log odds to probability
+logit2prob <- function(logit){
+  odds <- exp(logit)
+  prob <- odds / (1 + odds)
+  return(prob)
+}
+# Define Built in and out of Conflcit models that will depend on previous years conflict status 
+in_conflict <- function(data_year) {
+  attach(data_year)
+  intercept <- -5.56
+  in_Mobile.Cell.Subs <- -0.000
+  in_Population.Density <- -0.0304
+  in_Percent.Border.Conflict <- 2.5943
+  in_Government.1 <-  -1.4569
+  in_Government.3 <- -20.0807
+  in_Government.4 <- -3.5082
+  in_Government.5 <- -5.4795
+  in_conflict_trans <- intercept + (in_Mobile.Cell.Subs * data_year$Mobile.Cell.Subs) +
+    (in_Population.Density * data_year$Population.Density) +
+  (in_Percent.Border.Conflict * data_year$Percent.Border.Conflict) + (in_Government.1 * as.numeric(as.character(data_year$Government.1))) +
+  (in_Government.3 * as.numeric(as.character(data_year$Government.3))) + (in_Government.4 * as.numeric(as.character(data_year$Government.4))) + 
+    (in_Government.5 * as.numeric(as.character(data_year$Government.5)))
+  logit_trans <- logit2prob(in_conflict_trans)
+  return(logit_trans)
+  detach(data_year)
+}
+#
+out_conflict <-  function(data_year) {
+  attach(data_year)
+  intercept <- -0.8759
+  out_Fertility.Rate <- 2.2693
+  out_Trade.percent.GDP <- -0.0978
+  out_Two.Year.Conflict.Intensity.Trend <- 17.3657
+  out_conflict_trans <- intercept + (out_Fertility.Rate * Fertility.Rate) + 
+    (out_Trade.percent.GDP * Trade.percent.GDP) + (out_Two.Year.Conflict.Intensity.Trend * 
+                                                     Two.Year.Conflict.Intensity.Trend)
+  logit_trans <- logit2prob(out_conflict_trans)
+  return(logit_trans)
+  detach(data_year)
+}
+Arab_forecast_1 <- Arab_forecast[1:187,]
+Arab_forecast_1$index
+country_ids <- c(3,12,51)
+forecast_list = list()
+overall_list = list()
+
+for (reps in 0) {
+  for (country in country_ids) {
+    for (n in 2015:2018) {
+  # Arab_forecast_1 must be amended each time
+  # Variable one year prediction for index 3 with regression equations and noise (normal)
+      # Beginning with 2014 date and then increasing each year by n
+prev_year <- (n-1)
+subset_Arab <- Arab_forecast_1[ which(Arab_forecast_1$Year == prev_year & Arab_forecast_1$index==country), ]
+# in conflict 
+new_Mobile.Cell.Subs <- exp(predict(Arab_Mobile.Cell.Subs_reg, subset_Arab))
+new_Population.Density <- (predict(Arab_Population.Density_reg, subset_Arab)^2)
+new_Percent.Border.Conflict <- predict(Arab_Percent.Border.Conflict_reg, subset_Arab)
+# out of conflict 
+new_Fertility.Rate <- predict(Arab_Fertility.Rate_reg, subset_Arab)
+new_Trade.Percent.GDP <- predict(Arab_Trade.Percent.GDP_reg, subset_Arab)
+# Variables remaining constant or calculated 
+new_Government.1 <- as.numeric(as.character(subset_Arab$Government.1))
+new_Government.3 <- as.numeric(as.character(subset_Arab$Government.3))
+new_Government.4 <- as.numeric(as.character(subset_Arab$Government.4))
+new_Government.5 <- as.numeric(as.character(subset_Arab$Government.5))
+subset_Arab_prev_year <-  Arab_forecast_1[ which(Arab_forecast_1$Year == (n-2) 
+                                                 & Arab_forecast_1$index == country), ]
+new_Two.Year.Conflict.Intensity.Trend <- ((as.numeric(as.character(subset_Arab$HIIK.Conflict.Intensity))-
+                                            as.numeric(as.character(subset_Arab_prev_year$HIIK.Conflict.Intensity))) / 6)
+# Add Noise - No variables have negative minimum values just to note
+Arab_country <- Arab_forecast_1[ which(Arab_forecast_1$index==country), ] #Should this only be from the observed data
+# Right now it is growing and includes future values in mean and sd calcs
+sd <- apply(Arab_country,2, sd)
+sd_Mobile <- as.numeric(sd["Mobile.Cell.Subs"])
+sd_Population.Density <- as.numeric(sd["Population.Density"])
+sd_Percent.BC <- as.numeric(sd["Percent.Border.Conflict"])
+sd_Fertility <- as.numeric(sd["Fertility.Rate"])
+sd_Trade <- as.numeric(sd["Trade.percent.GDP"])
+mean <- colMeans(Arab_country[,c(3:5,10:11)])
+mean_Mobile <- as.numeric(mean["Mobile.Cell.Subs"])
+mean_Population.Density <- as.numeric(mean["Population.Density"])
+mean_Percent.BC <- as.numeric(mean["Percent.Border.Conflict"])
+mean_Fertility <- as.numeric(mean["Fertility.Rate"])
+mean_Trade <- as.numeric(mean["Trade.percent.GDP"])
+#
+# If mean is 0 then possibility of huge negative values that for example made new Mobile noise negative
+#
+new_Mobile.Cell.Subs_noise <- as.numeric(new_Mobile.Cell.Subs) + rnorm(1, mean = mean_Mobile, sd = sd_Mobile)
+new_Population.Density_noise <- as.numeric(new_Population.Density) + rnorm(1, mean = mean_Population.Density, 
+                                                                           sd = sd_Population.Density)
+new_Percent.Border.Conflict_noise <- as.numeric(new_Percent.Border.Conflict) + rnorm(1, mean = mean_Percent.BC,
+                                                                                     sd = sd_Percent.BC)
+new_Fertility.Rate_noise <- as.numeric(new_Fertility.Rate) + rnorm(1, mean = mean_Fertility,
+                                                                            sd = sd_Fertility)
+new_Trade.Percent.GDP_noise <- as.numeric(new_Trade.Percent.GDP) + rnorm(1, mean = mean_Trade,
+                                                                         sd = sd_Trade)
+
+# First add new row for next year 
+yearr <- n
+new_row <- data.frame(country, yearr, new_Mobile.Cell.Subs_noise, new_Population.Density_noise, new_Percent.Border.Conflict_noise,
+                      new_Government.1, new_Government.3, new_Government.4, new_Government.5, 
+                      new_Fertility.Rate_noise, new_Trade.Percent.GDP_noise,new_Two.Year.Conflict.Intensity.Trend)
+names(new_row) <- names(Arab_country)[1:12]
+rbind.all.columns <- function(x, y) {
+  x.diff <- setdiff(colnames(x), colnames(y))
+  y.diff <- setdiff(colnames(y), colnames(x))
+  x[, c(as.character(y.diff))] <- NA
+  y[, c(as.character(x.diff))] <- NA
+  return(rbind(x, y))
+}
+Arab_country <- rbind.all.columns(Arab_country, new_row)
+
+# Use Neumann Models with new data and compare transition probability to 
+last_year <- Arab_country %>%
+  filter(Year == (n-1))
+
+random_draw <- runif(1)
+
+if (last_year$Conflict_Status == 1) {
+    transition_probability <- in_conflict(last_year)
+    # See if it will actually transition
+    if (random_draw < transition_probability) {
+      Arab_country <- Arab_country %>% mutate(Conflict_Status=replace(Conflict_Status, Arab_country$Year == n, 0))
+      # Map HIIK Accordingly 
+      if (transition_probability > (5/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 0))
+      } else if (transition_probability <= (5/6) & transition_probability > (4/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 1))
+      } else if (transition_probability <= (4/6) & transition_probability > (3/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 2))
+      } else if (transition_probability <= (3/6) & transition_probability > (2/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 3))
+      } else if (transition_probability <= (2/6) & transition_probability > (1/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 4))
+      } else {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 5))
+      }
+    } else {
+    # No change
+      Arab_country <- Arab_country %>% mutate(Conflict_Status=replace(Conflict_Status, Arab_country$Year == n, 1))
+      # Map HIIK accordingly 
+      if (transition_probability > (5/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 5))
+      } else if (transition_probability <= (5/6) & transition_probability > (4/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 4))
+      } else if (transition_probability <= (4/6) & transition_probability > (3/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 3))
+      } else if (transition_probability <= (3/6) & transition_probability > (2/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 2))
+      } else if (transition_probability <= (2/6) & transition_probability > (1/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 1))
+      } else {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 0))
+      }
+    }
+} else {
+    transition_probability <- out_conflict(last_year)
+    # See if it will actually transition
+    if (random_draw < transition_probability) {
+      Arab_country <- Arab_country %>% mutate(Conflict_Status=replace(Conflict_Status, Arab_country$Year == n, 1))
+      # Map HIIK accordingly 
+      # Map HIIK accordingly 
+      if (transition_probability > (5/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 5))
+      } else if (transition_probability <= (5/6) & transition_probability > (4/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 4))
+      } else if (transition_probability <= (4/6) & transition_probability > (3/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 3))
+      } else if (transition_probability <= (3/6) & transition_probability > (2/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 2))
+      } else if (transition_probability <= (2/6) & transition_probability > (1/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 1))
+      } else {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 0))
+      }
+    } else {
+    # No change
+      Arab_country <- Arab_country %>% mutate(Conflict_Status=replace(Conflict_Status, Arab_country$Year == n, 0))
+      # Map HIIK Accordingly 
+      if (transition_probability > (5/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 0))
+      } else if (transition_probability <= (5/6) & transition_probability > (4/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 1))
+      } else if (transition_probability <= (4/6) & transition_probability > (3/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 2))
+      } else if (transition_probability <= (3/6) & transition_probability > (2/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 3))
+      } else if (transition_probability <= (2/6) & transition_probability > (1/6)) {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 4))
+      } else {
+        Arab_country <- Arab_country %>% mutate(HIIK.Conflict.Intensity=replace(HIIK.Conflict.Intensity, 
+                                                                                Arab_country$Year == n, 5))
+      }
+    }
+}
+
+forecast <- as.data.frame(Arab_country[nrow(Arab_country),])
+Arab_forecast_1 <- rbind(Arab_forecast_1, forecast)
+
+forecast <- forecast %>% mutate(transition.prob = transition_probability) %>% mutate(random.draw = random_draw)
+#forecast$rep <- reps
+#forecast_list <- rbind(forecast[1]
+#print(transition_probability)
+    }
+  }
+#  overall_list[[reps]] <- forecast
+}
+
+# the first year (2015) will always have the same transition probability since the 2014 data isn't changing
+all_runs <- do.call(rbind,forecast_list)
+View(all_runs)
+sub_15 <- Arab_forecast_1 %>% filter(Year==2015)
+sub_15
+
+
+View(Arab_forecast_1 %>%
+       arrange(index))
+
+
+
