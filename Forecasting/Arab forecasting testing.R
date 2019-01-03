@@ -24,7 +24,7 @@ Arab.cols <- c("index","Year","Mobile.Cell.Subs","Population.Density","Percent.B
                "Trade.percent.GDP", "Two.Year.Conflict.Intensity.Trend", "HIIK.Conflict.Intensity")
 
 Arab_forecast <- Arab_final %>% dplyr::select_(.dots = Arab.cols)
-
+#write.csv(Arab_forecast, file = "Arab_forecest_original_subset.csv")
 # Fix Factor Variables
 
 Arab_forecast$Government.1 <- as.factor(Arab_forecast$Government.1)
@@ -57,8 +57,12 @@ Arab_forecast$Conflict_Status <- Conflict_Status
 #
 # Define conversion equation from log odds to probability, also other relevant equations 
 logit2prob <- function(logit){
-  odds <- exp(logit)
+  odds <- exp(logit) 
+  if (is.infinite(odds)) {
+    prob <- 1
+  } else {
   prob <- odds / (1 + odds)
+  }
   return(prob)
 }
 # Define Built in and out of Conflcit models that will depend on previous years conflict status 
@@ -95,6 +99,7 @@ out_conflict <-  function(data_year) {
   return(logit_trans)
   detach(data_year)
 }
+
 #
 rbind.all.columns <- function(x, y) {
   x.diff <- setdiff(colnames(x), colnames(y))
@@ -104,15 +109,16 @@ rbind.all.columns <- function(x, y) {
   return(rbind(x, y))
 }
 #
-#
-
-
-
-
-
-
-
-
+# Operational value ranges
+Mobile.Cell.Subs_max <- (2*max(Arab_forecast$Mobile.Cell.Subs))
+Mobile.Cell.Subs_min <- (.5*min(Arab_forecast$Mobile.Cell.Subs))
+Population.Density_max <- (2*max(Arab_forecast$Population.Density))
+Population.Density_min <- (.5*min(Arab_forecast$Population.Density))
+Percent.Border.Conflict_max <- (2*max(Arab_forecast$Percent.Border.Conflict)) #No min necessary, it can be zero
+Fertility.Rate_max <- (2*max(Arab_forecast$Fertility.Rate))
+Fertility.Rate_min <- (.5*min(Arab_forecast$Fertility.Rate))
+Trade.percent.GDP_max <- 100
+Trade.percent.GDP_min <- (.5*min(Arab_forecast$Trade.percent.GDP))
 
 
 
@@ -122,24 +128,21 @@ Arab_forecast_1 <- Arab_forecast[1:187,]
 Arab_forecast_1$index
 table(Arab_forecast_1$index)
 #country_ids <- c(3,12,51,78,84,88,92,95,110,121,130,138,157,165,170,179,180)
-country_ids <- c(3,12)
+country_ids <- c(12)
 forecast_list = Arab_forecast_1 %>% filter(index <= 12 & Year==2014)
 #overall_list = list()
 
-for (reps in 1:3) {
+for (reps in 1:5) {
   Arab_forecast_1 <- Arab_forecast[1:187,]
   for (country in country_ids) {
     Arab_forecast_1 <- Arab_forecast[1:187,] #test test test 
-      for (n in 2015:2017) {
+      for (n in 2015:2035) {
   # Arab_forecast_1 must be amended each time
   # Variable one year prediction for index 3 with regression equations and noise (normal)
       # Beginning with 2014 date and then increasing each year by n
 prev_year <- (n-1)
 prev_prev_year <- (n-2)
-prev_prev_year
-prev_year
 sim <- reps
-country
 Arab_forecast_1 <- Arab_forecast_1 %>% filter(Year >= prev_prev_year) %>% 
   filter(index == country) %>% mutate(Rep = sim)
 #Arab_forecast_1 <- Arab_forecast_1 %>% filter(Year >= prev_year) %>% mutate(Rep = sim)
@@ -160,31 +163,11 @@ new_Government.5 <- as.numeric(as.character(subset_Arab$Government.5))
 
 subset_Arab_prev_year <- Arab_forecast_1 %>% filter(Year == prev_prev_year) %>%
   filter(index == country) %>% filter(Rep == sim)
-Arab_forecast_1
-prev_prev_year
-Arab_forecast_1
-n
-subset_Arab_prev_year
 new_Two.Year.Conflict.Intensity.Trend <- ((as.numeric(as.character(subset_Arab$HIIK.Conflict.Intensity))-
                                             as.numeric(as.character(subset_Arab_prev_year$HIIK.Conflict.Intensity))) / 6)
 
-
 # Add Noise - No variables have negative minimum values just to note
 Arab_country <- Arab_forecast_1 %>% filter(index == country) #Should this only be from the observed data
-
-# Right now it is growing and includes future values in mean and sd calcs
-# sd <- apply(Arab_country,2, sd)
-# sd_Mobile <- as.numeric(sd["Mobile.Cell.Subs"])
-# sd_Population.Density <- as.numeric(sd["Population.Density"])
-# sd_Percent.BC <- as.numeric(sd["Percent.Border.Conflict"])
-# sd_Fertility <- as.numeric(sd["Fertility.Rate"])
-# sd_Trade <- as.numeric(sd["Trade.percent.GDP"])
-# mean <- colMeans(Arab_country[,c(3:5,10:11)])
-# mean_Mobile <- as.numeric(mean["Mobile.Cell.Subs"])
-# mean_Population.Density <- as.numeric(mean["Population.Density"])
-# mean_Percent.BC <- as.numeric(mean["Percent.Border.Conflict"])
-# mean_Fertility <- as.numeric(mean["Fertility.Rate"])
-# mean_Trade <- as.numeric(mean["Trade.percent.GDP"])
 #
 # If mean is 0 then possibility of huge negative values that for example made new Mobile noise negative
 #
@@ -203,11 +186,41 @@ vars_values <- c(new_Mobile.Cell.Subs_noise, new_Population.Density_noise, new_P
                  new_Fertility.Rate_noise, new_Trade.Percent.GDP_noise)
 vars_names <- c("new_Mobile.Cell.Subs_noise", "new_Population.Density_noise", "new_Percent.Border.Conflict_noise",
                 "new_Fertility.Rate_noise", "new_Trade.Percent.GDP_noise")
+# Non Negativity 
 for (i in 1:length(vars_values)) {
   if (vars_values[i] <= 0 | is.na(vars_values[i])) {
     vars_values[i] <- 0
     assign(vars_names[i],vars_values[i])
   }
+} 
+# Mobile Restrictions 
+if (new_Mobile.Cell.Subs_noise > Mobile.Cell.Subs_max) {
+  new_Mobile.Cell.Subs_noise <- Mobile.Cell.Subs_max
+} else if (new_Mobile.Cell.Subs_noise < Mobile.Cell.Subs_min) {
+  new_Mobile.Cell.Subs_noise <- Mobile.Cell.Subs_min
+}
+# Population Density Restrictions
+if (new_Population.Density_noise > Population.Density_max) {
+  new_Population.Density_noise <- Population.Density_max
+} else if (new_Population.Density_noise < Population.Density_min) {
+  new_Population.Density_noise <- Population.Density_min
+}
+# Percent Border Conflict 
+if (new_Percent.Border.Conflict_noise > Percent.Border.Conflict_max) {
+  new_Percent.Border.Conflict_noise <- Percent.Border.Conflict_max
+}
+
+# Fertility Rate Restrictions
+if (new_Fertility.Rate_noise > Fertility.Rate_max) {
+  new_Fertility.Rate_noise <- Fertility.Rate_max
+} else if (new_Fertility.Rate_noise < Fertility.Rate_min) {
+  new_Fertility.Rate_noise <- Fertility.Rate_min
+}
+# Trade.percent.GDP Restrictions
+if (new_Trade.Percent.GDP_noise > Trade.percent.GDP_max) {
+  new_Trade.Percent.GDP_noise <- Trade.percent.GDP_max
+} else if (new_Trade.Percent.GDP_noise < Trade.percent.GDP_min) {
+  new_Trade.Percent.GDP_noise <- Trade.percent.GDP_min
 }
 
 # First add new row for next year 
@@ -348,20 +361,18 @@ forecast_list <- rbind.all.columns(forecast_list, forecast)
 
 View(Arab_country)
 
-View(forecast_list)
 
 sub_15<- Arab_forecast_1 %>% filter(Year==2015)
 sub_15
 
 View(Arab_forecast_1 %>%
        arrange(index))
-View(forecast_list %>%
+forecast_list <- (forecast_list %>%
        arrange(index))
+View(forecast_list)
+
 View(forecast_list %>%
        arrange(index) %>%
        select(index, Year, HIIK.Conflict.Intensity, Conflict_Status, transition.prob, random.draw, Rep))
 
-
-
-
-
+write.csv(forecast_list, file = "Arab_3_repstofive_22dec.csv")
