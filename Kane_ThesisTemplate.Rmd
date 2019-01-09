@@ -166,37 +166,35 @@ The study, _A Global Forecasting Model of Political Instability_, conducted by D
 
 This research explores imputation techniques to first fill missing gaps int the data and develop linear regression models to develop future alternatives of nation-state conflict for two major world regions. Section 3.2 describes the methodology used to develop the data set and imputation methods used to complete the data's missing observations. Section 3.3 outlines the development and building procedures for the linear regression models for each variable of interest. Section 3.4 
 
-```{r, engine="tikz", eval = TRUE, fig.cap = "Methodology Overview", echo=FALSE, fig.width=30, fig.height=30}
+```{r, engine="tikz", eval = TRUE, fig.cap = "Methodology Overview", echo=FALSE}
+\usetikzlibrary{shapes,arrows}
+\pagestyle{empty}
 
-\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
-text width=9em, text centered, rounded corners, minimum height=4em]
-#\tikzstyle{line} = [draw, -latex']
+\tikzstyle{block} = [rectangle, draw, fill=grey!20, 
+text width=11em, text centered, rounded corners, minimum height=4em]
 
-#\usetikzlibrary{arrows}
-\usetikzlibrary{arrows.meta}
-\tikzstyle{arrow} = [draw, >=angle 90, thick]
-
-\begin{tikzpicture}[node distance = 2cm, auto, >= triangle 60]
+\begin{tikzpicture}[scale = .85, transform shape, node distance = 2cm, auto, >= triangle 60]
     % nodes
-    \node [block] (init) {\Large Multiple Imputation of Multivariate Missing Data};
-    \node [block, right of = init, node distance = 5cm] (sec) {\Large Develop Regression Models Variables of Interest};
-    \node [block, right of = sec, node distance = 5cm] (third) {\Large Regression Model Analysis};
-    \node [block, below of = init, node distance = 3.5cm] (four) {\large Set Trend of Chosen Variable};
-    \node [block, right of = four, node distance = 5cm] (fifth) {\Large Derive One Step Forward using Regression Models};
-    \node [block, right of = fifth, node distance = 5cm] (six) {\Large Complete Future Data};
-    \node [block, below of = four, node distance = 3.5cm] (sev) {\Large Utilize Logistic Regression Models};
-    \node [block, right of = sev, node distance = 5cm] (eight) {\Large Simulate Results using Markov Model};
-    \node [block, right of = eight, node distance = 5cm] (nine) {\Large Analyze Alternative Futures};
-    
-    \path [line] (init) -- (sec);
-    \path [line] (sec) -- (third);
-    \path [line] (third) |- ([xshift = 0cm, yshift = -1.75cm].northwest) -- (four);
-    \path [line] (four) -- (fifth);
-    \path [line] (fifth) -- (six);
-    \path [line] (six) |- ([xshift = 0cm, yshift = -5.5cm].northwest) -- (sev);
-    \path [line] 
+    \node [block] (init) {Collect data set};
+    \node [block, right of = init, node distance = 5cm] (sec) {Imputation selection and implementation};
+    \node [block, right of = sec, node distance = 5cm] (third) {Individual\\variable regression model generations};
+    \node [block, below of = init, node distance = 3.5cm] (four) {Single step\\iterative future method};
+    \node [block, right of = four, node distance = 5cm] (fifth) {Utilize country conflict logistic\\regression models};
+    \node [block, right of = fifth, node distance = 5cm] (six) {Replicate for a given future dataset};
+    \node [block, below of = four, node distance = 3.5cm] (sev) {Multiple future data sets};
+    \node [block, right of = sev, node distance = 5cm] (eight) {Statistical analysis of each future data set};
+    \node [block, right of = eight, node distance = 5cm] (nine) {Conduct what if future analysis};
+
+    \draw[-triangle 60] (init) -- (sec);
+    \draw [->] (sec) -- (third);
+    \draw [->] (third) |- ([xshift = 0cm, yshift = -1.75cm].northwest) -- (four);
+    \draw [->] (four) -- (fifth);
+    \draw [->] (fifth) -- (six);
+    \draw [->] (six) |- ([xshift = 0cm, yshift = -5.65cm].northwest) -- (sev);
+    \draw [->] 
       (sev) edge (eight)
       (eight) edge (nine);
+    \draw [->, dashed] (six) |- ([xshift = 0cm, yshift = -5.075cm].northwest) -- (four);
 \end{tikzpicture}
 
 ```
@@ -306,7 +304,6 @@ print(xtd2, comment = F, include.rownames=FALSE, scalebox = 0.8,
 
 A problem that aross specifically with the South East Asia region is some variables are linearly related. When the MICE algorithm builds the regression equation to predict a missing value, a variable that is a linear combination of another will result in a singularity error that breaks the MICE algorithm. To fix this, the redundent variables must be excluded from the set of predictor variables used by MICE. The dependent variables can be identified by the last eigenvector of the covariance matrix of the data after performing listwise deletion. The variable Mobile Cell Subscriptions was highly correlated ($>0.5$) with multiple variables. Mobile Cell Subscriptions by far had the smallest loading ($2.012761e-11$) on the on the last eigenvector of the covariance matrix. For these reasons Mobile Cell Subscriptions was imputed individually using the MICE algorithm. When removed the singularity errors ceased to disrupt the MICE algorithm.  
 
-
 ## Regression Models
 
 With the complete data from the previous ten years since 2014, linear regression models were built for each variable of interest. Neumann's model's for regions in and out of conflict defined the variable that would be of interest for this research. The variables required in Neumann's models will be required to predict future conflict transitions. The regression equations define each variable to be explained by the rest of the data. Each regression model was built with the goal of achieving the most parsimonium model from the other variables in the data. Before the regression models were build and reduced, the data set required certain variables gereated by Neumann's research be developed using the complete data. Van Buuren stressed the importance of developing imputations before any additional variables are generated (CITE Van Buuren). Additionally certain variables that are derived from the rest of the data didn't require regressions to be build since their values in future scearios can be calculated then. 
@@ -391,7 +388,7 @@ names(conflict_transition_map) <- c("Conflict Status Yr $i-1$", "Conflict Status
                              "Conflict Transition Yr $i$")
 bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
 print(conflict_transition_map, comment = F, include.rownames=FALSE, scalebox = 0.9,
-      sanitize.text.function = function(x){x}, table.placement = "H", hline.after = c(0,2),
+      sanitize.text.function = function(x){x}, table.placement = "H", hline.after = c(-1,0,2,nrow(conflict_transition_map)),
       sanitize.colnames.function = bold, booktabs = T
       )
 
@@ -399,7 +396,7 @@ print(conflict_transition_map, comment = F, include.rownames=FALSE, scalebox = 0
 
 ### Model Building Procedure
 
-Linear regression models were build for variables that were significant in Neumann's logisitic regression models that predict a country's Conflict Transition. Linear regression models were build to statistically define each individual variable of interest by the other variables in a given region. Testing was completed to include higher order terms and interaction terms in these models, but due to the higher achieved adjuste $R^2$ values, models were only build using the main effects. The complete data set used to build the models consists of all five of the imputed data sets stacked on top of each other. This goes against Van Buuren's advice to pool the resulting models, but due to the desire for point estimates defining each variable of interest, the simplier method of stacking the imputations was preferred. With less than $10\%$ of the observations missing from the two new world regions of interest, the research is impacted less from weight of the missing data. The stacked imputed data results in _m_ x _n_ complete records where _m_ still being the number of imputed data sets. The statistical analysis thus becomes a weighted linear regression with a weighted factor of $1/m$ applied to each record. Having low levels of missingness and the point estimates generated from the stacked complete data being unbiased (CITE page 158) makes treating the imputed data as a stacked, long data set sufficient for the purposes of this research.
+Linear regression models were build for variables that were significant in Neumann's logisitic regression models that predict a country's Conflict Transition. Linear regression models were build to statistically define each individual variable of interest by the other variables in a given region. Testing was completed to include higher order terms and interaction terms in these models, but due to the higher achieved adjusted $R^2$ values, models were only build using the main effects. The complete data set used to build the models consists of all five of the imputed data sets stacked on top of each other. This goes against Van Buuren's advice to pool the resulting models, but due to the desire for point estimates defining each variable of interest, the simplier method of stacking the imputations was preferred. With less than $10\%$ of the observations missing from the two new world regions of interest, the research is impacted less from weight of the missing data. The stacked imputed data results in _m_ x _n_ complete records where _m_ still being the number of imputed data sets. The statistical analysis thus becomes a weighted linear regression with a weighted factor of $1/m$ applied to each record. Having low levels of missingness and the point estimates generated from the stacked complete data being unbiased (CITE page 158) makes treating the imputed data as a stacked, long data set sufficient for the purposes of this research.
 
 Stepwise regression is the primary method used to generate parsimonous linear regression models for each variable. This method iteratively removes predictor variables while computing a linear regression model each time. Each time a regression is rerun, each predictor variable's associated p value is assessed to see if it is within a specified acceptable range. By deleting variables from the model, the precision of point estimates of the remaining in the model are improved (CITE intro to linear). The stepwise method was run using JMP with chosen p value for entering and removing a variable of 0.05. Stepwise regression operates in a direction to either enter or remove a term with the smallest or largest p value. The mixed option in JMP alternates between a forward and backward selection to include the only significant terms. Models were building stepping from a null and full model using the mixed selection method. Most times the reduced models were the same, but if there were any differences, the model that achieved the higher $R^2_{adj}$ was chosen. The coefficient of multiple determination, $R^2$, is a measure of model adequacy that represents the proportion of variance explained by the regression. Adding regressors to the model will improve $R^2$ but can still produce a worse model and larger error mean square by losing one degree of freedom for error (CITE intro). A low value of $R^2$ for this research indicates a poorly specified model (CITE intro). $R^2$ will never decrease from adding a variable to the model, so it is important in varaibel selection to include another evaluation statistic. $R^2_{adj}$ will only improve if the variable added reduces the residual mean square to prevent overfitting (CITE intro). This research will reference to $R^2_{adj}$ when evaulating models in stepwise regression. Interaction terms were also selectively included in models with lacking $R^2_{adj}$ (<0.5). In an effort to devleop parsimonious models, only second order interaction terms were considered. With the interactions factored into the model, the Arab region produced 74 possible variables while there were 209 possible variables in the SE Asia region. Stepwise regression reduced these numbers for the models requiring higher $R^2_{adj}$. All of the Arab region models were built with interactions, but only Population Growth's interactions were necessary in South East Asia.
   
@@ -440,6 +437,84 @@ Even after the transformations were added, the regression models didn't statisti
 
 ## Iterative Forecasting 
 
+With the data properly imputed and regression models built for each variable of interest, the alternative futures were developed. An iterative explanatory approach inspired by univariate imputation techniques was the primary approach to generating the complete future data sets. For each region individually, Neumann's conflict prediction models were applied each year to see find a probability of a country transitioning in or out of a state of conflict. Each variable value would be calculated using the previous years values using the regression equations created based on the other variables of interest in their respective region. To improve on the predicted value of these equations, random noise was added to the predicted value. This noise introduces variability that reflects the inherent inaccuracy associated with predicting variables from an insufficient subset of variables. Van Buuren (CITE) injects noise from a random draw from the normal distribution based on the assumption that the observed data is normally distributed around the regression line. Due to the regression equations largely violating this assumption, the noise instead came from a random draw from the residuals of the variables' regression equations. Before Neumann's conflict transition logistic regressions could be applied, the complete predicted data for the next year were assessed for operational feasibility. This varied by region and variable, but the variables' values were restricted as to not exceed two times the region's largest value and one half of the region's smallest value recorded in the last ten years. These conservative limits placed on the prediction values plus the noise elliminated variables reaching inconceivable highs or lows and maintained the operational relevancy of this research. 
+
+Certain variables identified as signficant to predicting conflict transitioning were calculated based on the new variables' values rather than by their own regression equations with noise or were assumed not to be changing over the years. The two year conflict intensity trend of a country was calculated manually based on the previous year's HIIK conflict intensity score minus the country's HIIK conflict intensity score from two years ago all divided by six for the six different HIIK levels. The regime and government type variables were assumed not to change year to year because they are binary indicators of levels ranging from autocracy to democracy for a nation which for this research's purposes wouldn't change over the years of focus. A country's government type is considered a hard to change factor, so the iterative forecast method treated a nation's government as constant through the course of any conflict transitions. The HIIK conflict intensity level each year was calculated based on the probability that a nation would transition in or out of conflict. The new year's data would be plugged into Neumann's logistic regression equations depending on the conflict status of the previous year. From there the predicted value of the logisitic regression would be converted into a probability. Recall that the formula for a logistic regression function is as follows.
+
+\begin{equation}
+ln(\frac{p}{1-p})=\beta_0+\beta_1x_1+...+\beta_nx_n
+\end{equation}
+
+The formula for logistic regression contains p, the probability and n, the number of variables. To solve for p, the exponential of the predicted value of logistic regression was divided by one plus the same exponential of the predicted value from the logistic regression. 
+ 
+\begin{equation}
+p=\frac{exp(\beta_0+\beta_1x_1+...+\beta_nx_n)}{1+exp(\beta_0+\beta_1x_1+...+\beta_nx_n)}
+\end{equation}
+
+A higher probability indicates that a nation has a higher chance of transitioning conflict statuses while a smaller probability means a country's conflict status will remain at the same level of conflict for that year. A 0.5 probability cutoff was used to decided which direction a country would transition: transition or stationary. A random draw was taken between 0 and 1 to compare to the calculated transition probability. The random draw comparison represents the uncertainty that given a country's probability to transition conflict status, a country may not actually transition in the direction the logistic regression equations found to have the highest probability. If the random draw, in the direction of transition or remaining the same exceeds the logistic regression equation's probability of conflict transition than the country's conflict will in fact not do what it has the highest probability of doing. For example, if a country was in conflict last year and the in conflict equation for that region found a transition probability of 0.91, the country is likely to transition to being out of conflict. A random draw would be taken between 0 and 1, and say the random draw was 0.95, than due to the random draw exceeding the transition probability in the likely transition direction, than the country would remain in conflict. 
+
+HIIK conflict intensity was mapped each year based on the conflict transition probability and random draw comparison. If a country, after taking and comparing the random draw, transitions in the direction indicated by the transition probability than the HIIK conflict intensity was just mapped following the below mapping. 
+
+```{r in_HIIKmapping, xtable, results='asis', eval=TRUE}
+
+in_conflict_HIIK_transition <- data.frame(
+  '1' = c("Transition and Does", "", "",
+          "Transition and Doesn't",
+          "Remain and Does", "", "",
+          "Remain and Doesn't"),
+  '2' = c("Not In Conflict", "", "",
+          "In Conflict", 
+          "In Conflict",  "", "",
+          "Not In Conflict"),
+  '3' = c("(1-$5/6$) = 0", "($5/6$-$4/6$) = 1", "($4/6$-$3/6$) = 2",
+          "3", 
+          "($3/6$-$2/6$) = 3", "($2/6$-$1/6$) = 4", "($1/6$-0) = 5",
+          "2")
+)
+
+
+in_HIIK_map <- xtable::xtable(in_conflict_HIIK_transition, caption = 'Previous Year In Conflict Mapping HIIK Conflict Intensity ', label = 'tab:in_HIIK_mapping', align = "ll|c|c")
+names(in_HIIK_map) <- c("Random Draw Comparison",
+                                    "Conflict Status Year $i$", "Year $i$ HIIK Mapping")
+bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
+print(in_HIIK_map, comment = F, include.rownames=FALSE, scalebox = 0.75,
+      sanitize.text.function = function(x){x}, table.placement = "H", hline.after = c(-1,0,3,4,7,nrow(in_HIIK_map)),
+      sanitize.colnames.function = bold, booktabs = T
+      )
+
+```
+
+For a country that was in conflict the previous year, the random draw comparison column reads transition when the transition probability calculated using Nuemann's in conflict logistic regression equations yield a probability over 0.5. If the random draw is larger than the transition probability, the column will read transition and doesn't. Since the country's conflict is behaving contradictory to how the equations predict, the HIIK conflict intensity is mapped to being the lowest in conflict score of 3. Otherwise, the column reads transition and does, meaning the country for that year transitions to not in conflict and it's HIIK conflict intensity is inversly mapped based on an even division between 0.5 and 1 for the out of conflict HIIK conflict intensity scores. The same approach is taken when a country in conflict is supposed to stay in conflict (transition probability < 0.5) except now the country will only do the opposite of the predicted transition probability if the random draw is less than the transition probability. In the case that the random draw is that small and the country doesn't stay in conflict, HIIK conflict intensity is set as the lowest not in conflict score of 2. When the previously in conflict country should remain in conflict and does, the transition probability is directly mapped to the top three HIIK in conflict scores based on an even division of 0.5 to 0 as seen above. The proceeding mapping of a country that was not in conflict the previous year is mapped in the same manor but with some of the mappings flipped accordingly. 
+
+```{r out_HIIKmapping, xtable, results='asis', eval=TRUE}
+
+out_conflict_HIIK_transition <- data.frame(
+  '1' = c("Transition and Does", "", "",
+          "Transition and Doesn't",
+          "Remain and Does", "", "",
+          "Remain and Doesn't"),
+  '2' = c("In Conflict", "", "",
+          "Not In Conflict", 
+          "Not In Conflict",  "", "",
+          "In Conflict"),
+  '3' = c("(1-$5/6$) = 5", "($5/6$-$4/6$) = 4", "($4/6$-$3/6$) = 3",
+          "2", 
+          "($3/6$-$2/6$) = 2", "($2/6$-$1/6$) = 1", "($1/6$-0) = 0",
+          "3")
+)
+
+out_HIIK_map <- xtable::xtable(out_conflict_HIIK_transition, caption = 'Previous Year Not In Conflict Mapping HIIK Conflict Intensity ', label = 'tab:out_HIIK_mapping', align = "ll|c|c")
+names(out_HIIK_map) <- c("Random Draw Comparison",
+                                    "Conflict Status Year $i$", "Year $i$ HIIK Mapping")
+bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
+print(out_HIIK_map, comment = F, include.rownames=FALSE, scalebox = 0.75,
+      sanitize.text.function = function(x){x}, table.placement = "H", hline.after = c(-1,0,3,4,7,nrow(out_HIIK_map)),
+      sanitize.colnames.function = bold, booktabs = T
+      )
+
+```
+
+HIIK conflict intensity was an important variable to map as it was included in multipe variables' explanatory regression equations previously built. It depends on the conflict status of a country, so it was calculated iteratively each year after the transition probability equations were already applied.
 
 # Analysis And Results
 
