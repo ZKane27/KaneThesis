@@ -151,25 +151,39 @@ How robust are the future alternatives of conflict tranistions to the what-if an
 
 ## Assumptions and Limitations
 
-This study is based on XXXX underlying assumptions. The first assumption, similiar to other conflict prediction research, is that the data analyzed is accurate and describes the commonalities between countries and their conflicts. The second assumption is that the variables identified as significant for Neumann's conflict prediction models are the only relevant variables for predicting conflict during the duration of future years. Next, this study assumes 
+This study is based on four underlying assumptions. The first assumption, similiar to other conflict prediction research, is that the data analyzed is accurate and describes the commonalities between countries and their conflicts. The geographical groupings by region identified by the Neumann study were assumed to be suitable commonality in terms of economy, geography, ethnic, and religious demographics to develop future alteratives. The third assumption is that the variables identified as significant for Neumann's conflict logitstic regression models are the only relevant variables for predicting conflict during the duration of future years.  Lastly, this study assumes that the predictive models found by Neumann are accurate and uneffected over the years by the changing generated future data. 
+
+Data availibility limitated this research by forcing multiple imputation techniques to be applied to the gaps observed for certain variables. After combining multiple opensources, over half of the variables required imputation of their missing values. With a largely imputated data set then being used to generate future data, the level of uncertainty behind the numbers worsened the adequacy of the regression models. Additionally, computing power and time limited the variables extrapolated to only those found significant in a region's conflict prediction models as opposed to all the variables availible. A greater degree of fidelity could have been achieved by developing the future alternatives with more information provided by all of the variables recorded. Despite the inherent limitations of this research, it proceeds to provide national leadership with complete data, a tested forecasting method, and future, realistic country conflicts to consider when developing foreign policy and security stategies.
 
 ## Overview
+
+This thesis is organized into 5 chapters including this introduction chapter, Chapter 1. Chapter 2 contains a literature review of prominent studies and methods relating to this research. Chapter 3 discusses the methodology of the study to impute the data and develop the alternative futures of conflict transitions. Chapter 4 details the results and analyses, and chapter 5 offers final conclusions, and possibilities for future research.
 
 # Literature Review
 
 ## Overview
 
-The purpose of this chapter is to provide insight gained froms previous influential research done on country conflict prediction and understaning into the statistical methods practiced in this research's forecasting analysis.
+The purpose of this chapter is to provide a background of the previous influential research done on country conflict prediction that this research is built upon as well as an explanation of the existing contributions made to predict based future data. This chapter is broken down into three main sections: existing nation-state conflict modeling, applied imputation techniques, and related forecasting applications. The first section of this chapter focuses on the development of predictive models for nation-state conflict that lead to the very model employed by this research. The second section identifies similar imputation methods and comparison stategies that informed this research's handling of missing data. The final section provides a summary of related applications of explanatory forecasting efforts that this research's own generative alternative future method. This chapter ultimately aims to cover literature about the main models, methods, and applications related to this research.
 
-## Nation-State Conflict Prediction Models
+## Previous Nation-State Conflict Models
 
-Predicting world conflict has been a problem addressed by multiple studies. There have been different prediction methologies and ways researchers have defined conflict or the relevant variables. There have been varying accuracies these predictive models have achieved. This section outlines the current progress already made on predicting that will be the basis of this researches work on alternative future analysis of world conflict.
+Predicting world conflict has been a problem addressed by multiple studies. There have been different prediction methologies where researchers have defined conflict, the influential variables, and how best to group countries prior to predicting their conflicts. There have been varying accuracies achieved by these predictive modeling efforts. This section outlines the progress already made in predicting countries conflict status which is the basis of this research's generation of alternative world conflict futures.
 
-The study, _A Global Forecasting Model of Political Instability_, conducted by Dr. Jack Goldstone for the U.S. Central Intelligence Agency's Directorate of Intelligence predicted the onset of political instability two years prior to the conflict's start (CITE Goldstone). The research took open source global data from 1955 to 2003 and performed a variety of prediction techniques with an achieved high, 80\% accuracy distinguishing between countries that experienced instability from those that remained stable (CITE Goldstone). The study found a nonlinear five-category measure of regime type to be the most powerful predictor rather than economic conditions, demography, or geography (CITE Goldstone). Conflict, the dependent variable, was defined by the study as a Revolutionary War, Ethnic War, Adverse Regime Changes, or Genocides and Politicides (CITE Goldstone). Of the predictive event history models, logistic regression, neural networks, and Markov processess tested, the simple logisitc regression model performed best with only four independent variables. These results gave insight for future researchs to the importance of fewer, major variables in conflict models as well as logistic regression being a favorable method political instability prediction.
+The 2013 research, _Learning from the Past and Stepping into the Future: Toward a New Generation of Conflict Prediction_, focused on the benefits that prediction models of political conflict in a complicated geopolitical landscape could provide (CITE). The authors defended the importance of country conflict prediction and identified limitations in previous research. Previous research had fixated on including statistically significant variables while overlooking a variable's impact on a the model's overall predictive accuracy. Ward's developed a model of behavioral and instituational variables to predict the cumulative probability of civil war six months prior prior to it's onset in various countries. This hierarchial logit model's slope and intercept differed depending on different groups of nations and achieved a accurately predicted civil wars 95\% of the time. Ward's research was the first to put a greater deal of importance on prediction accuracy in addition to just building models with siginificant variables. Until the Ward study and Goldstone's efforts, conflict prediction models' precdition accuracies were capped at limited around 50\%. 
+
+The study, _A Global Forecasting Model of Political Instability_, conducted by Dr. Jack Goldstone for the U.S. Central Intelligence Agency's Directorate of Intelligence predicted the onset of political instability two years prior to the conflict's start (CITE Goldstone). Goldstone's research took open source global data from 1955 to 2003 and performed a variety of predictive techniques to achieve 80\% accuracy distinguishing between countries that experienced instability from those that remained a constant level of political  (CITE Goldstone). Goldstone's study found a nonlinear five-category measure of regime type to be the most powerful predictor rather than economic conditions, demography, or geography (CITE Goldstone). Country conflict, the dependent variable, was defined as a revolutionary war, ethnic war, adverse regime changes, or genocides and politicides (CITE Goldstone). Of the predictive event history models, logistic regression, neural networks, and Markov processess tested, the simple logisitc regression model performed best with only four independent variables. These results gave insight for future researchers to the importance of fewer, major variables in reducing the unexplained variance of the conflict models as well as logistic regression being a favorable method political instability prediction. Goldstone's model was built on a world scale and ignored the differences between nations' locations. In fact, the sole region modeled seperately, Africa, included different variables for predicting country conflict which indicates towards the pertinence of regional differences. 
+
+The Center for Army Analysis's research _Recognizing Patterns of Nation-State Instability that Lead to Conflict_ analyzed the influential factors in predicting country conflict relevant to Army operations. 
 
 
 
-## Bayesian Forecasting
+## Applied Imputation Techniques
+
+
+
+## Related Forecasting Applications
+
+
 
 # Methodology
 
@@ -321,7 +335,7 @@ With the complete data from the previous ten years since 2014, linear regression
 
 ### Variable Development
 
-After filling all the missing gaps in the data, variables of interested were developed to match the data set of previous works such as Neumann and Shellcross. A Government variable was created based on the values of the Polity variarble to indicate a nation's government type. The six categories of this variable are shown in Table \@ref(tab:govmapping).
+After filling all the missing gaps in the data, variables of interested were developed to match the data set of previous works such as Neumann and Shallcross. A Government variable was created based on the values of the Polity variarble to indicate a nation's government type. The six categories of this variable are shown in Table \@ref(tab:govmapping).
 
 ```{r govmapping, xtable, results='asis', eval=TRUE}
 
@@ -347,7 +361,7 @@ print(government_table, comment = F, include.rownames=FALSE, scalebox = 0.9,
 
 ```
 
-The Percent Border Conflict is consistent with the percent border conflict variable in Neumann (CITE Neumann) and border conflict variable in Shallcross (CITE Shellcross) and Boekestein (CITE BOEK). The Percent Border Conflict is calculated by summing the product of all the percentages neighboring country border a country of interest and the neighboring countries HIIK level of conflict intensity for a given year. Islands were assumed to have no neighboring countries and a zero Percent Border Conflict. Equation XX defines the Percent Border Conflict Variable 
+The Percent Border Conflict is consistent with the percent border conflict variable in Neumann (CITE Neumann) and border conflict variable in Shallcross (CITE Shallcross) and Boekestein (CITE BOEK). The Percent Border Conflict is calculated by summing the product of all the percentages neighboring country border a country of interest and the neighboring countries HIIK level of conflict intensity for a given year. Islands were assumed to have no neighboring countries and a zero Percent Border Conflict. Equation XX defines the Percent Border Conflict Variable 
 \begin{gather}
 PctBC_{ij} = \sum_{k=1}^{n} H_{kj}p_{k} \text{where} \nonumber\\
 n = \text{number of bordering countries for country $i$} \nonumber\\
@@ -527,11 +541,11 @@ print(out_HIIK_map, comment = F, include.rownames=FALSE, scalebox = 0.75,
 
 HIIK conflict intensity was an important variable to map as it was included in multipe variables' explanatory regression equations previously built. It depends on the conflict status of a country, so it was calculated iteratively each year after the transition probability equations were already applied.
 
-# Analysis And Results
+# Analysis and Results
 
 This is the fourth chapter of your thesis
 
-# Conclusion
+# Conclusions
 
 This is the final chapter of your thesis.
 
