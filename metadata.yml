@@ -1,60 +1,49 @@
 author:
-  firstname: 'Jason'
-  lastname: 'Freels'
-  middle: 'K'
-  department: 'ENV'
-  service: 'USAF' # Use abbreviation - leave blank if NA
-  rank: 'Major'
-  afsc: '62E3A'
-  currentDegree: 'BS'
-  phone: 800-555-5555
-  email: 'jason.freels@afit.edu'
-program: "Systems Engineering"
+  firstname: 'Zachary'
+  lastname: 'Kane'
+  middle: 'J'
+  department: 'ENS'
+  service: 'USAF'
+  rank: '2nd Lt'
+  afsc: '61A'
+  currentDegree: 'B.S.'
+  phone: 215-450-0487
+  email: 'Zachary.Kane@afit.edu'
+program: "Operations Research"
 degree: "Master of Science"
-grad_date: '16 June 2016'
+grad_date: '21 March 2019'
 advisor:
-  name: 'Joseph J. Pignatiello'
+  name: 'Darryl K. Ahner'
   department: 'ENS' # Use three-letter designator
-  rank: 'Civilian'
-  service: 'usaf' # Use abbreviation - leave blank if NA
+  rank: 'PhD'
+  service: # Use abbreviation - leave blank if NA
   currentDegree: 'PhD'
-  phone: '937-255-3636 x4676'
-  email: "joseph.pignatiello@afit.edu"
+  phone: '937-255-6565 x4708'
+  email: "Darryl.Ahner@afit.edu"
 reader1:
-  name: 'Raymond R. Hill'  # First Reader
+  name: 'Seong-Jong Joo'  # First Reader
   department: 'ENS' # Use three-letter designator
-  rank: 'Civilian'
-  service: 'usaf' # Use abbreviation - leave blank if NA
-  currentDegree: 'PhD'
-reader2:
-  name: 'Richard L. Warr'  # Second Reader
-  department: 'ENC' # Use three-letter designator
-  rank: 'Lieutenant Colonel'
-  service: 'usaf' # Use abbreviation - leave blank if NA
-  currentDegree: 'PhD'
-reader3:
-  name: 'Robert Wirthlin'  # Third Reader
-  department: 'ENV' # Use three-letter designator
-  rank: 'Lieutenant Colonel'
-  service: 'usaf' # Use abbreviation - leave blank if NA
+  rank: 'PhD'
+  service: # Use abbreviation - leave blank if NA
   currentDegree: 'PhD'
 document:
-  title: "A Capitalized Title: Something about a Package"
-  designator: 'AFIT-ENG-DS-16-J-009'
-  pages: 30
+  title: "AN IMPUTATION STYLE APPROACH TO DEVELOP ALTERNATIVE FUTURES OF COUNTRY CONFLICT"
+  designator: 'AFIT-ENS-MS-19-M'
+  pages: 53
   keywords: 'LaTeX,Thesis,typesetting'
   type: 'Thesis'
 abstract: >
-  The abstract of the thesis.
+  My abstract 
 dedication: >
-  The dedication.
+  My dedication
 acknowledgement: >
-  The acknowledgement.
+  My acknowledgements
+
 vita: >
-  The vita.
+
 distribution_statement:
-  A: no        # distribution unlimited
-  B: yes       # U.S. Government agencies only
+  A: yes        # distribution unlimited
+  B: no       # U.S. Government agencies only
   C: no        # U.S. Government agencies and their Contractors
   D: no        # DOD and DOD contractors only
   E: no        # DOD components only
@@ -74,16 +63,18 @@ distribution_reason:  # WHY NOT DISTRIBUTION A?
   vul: no       # Vulnerability Information
   ops: no       # Operations Security
 distribution_rationale: >
-  'Add some stuff here'
-release_authority: 'Org name'
+  No necessary government information is shown that is not already available to the public
+release_authority: 
 release_condition: >
-  'Under what conditions would you release this'
+
 sf298:
   contractnum: 'DACA99-99-C-9999'
   grantnum: ''
   programnum: ''
   projectnum: ''
-  tasknum: ''
+  tasknum: '' 
+  
+  
   workunitnum: ''
 sponsor:
   title: 'Air Force Institute of Technology'
@@ -94,4 +85,5 @@ sponsor:
   email: 'first.last@afit.edu'
   acronym: 'AFIT'
   report_number: ''
-numeric_citations: no
+numeric_citations: yes
+

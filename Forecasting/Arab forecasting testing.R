@@ -120,23 +120,20 @@ Fertility.Rate_min <- (.5*min(Arab_forecast$Fertility.Rate))
 Trade.percent.GDP_max <- 100
 Trade.percent.GDP_min <- (.5*min(Arab_forecast$Trade.percent.GDP))
 
-
-
 # FOR LOOP SECTION
-
 Arab_forecast_1 <- Arab_forecast[1:187,]
 Arab_forecast_1$index
 table(Arab_forecast_1$index)
 #country_ids <- c(3,12,51,78,84,88,92,95,110,121,130,138,157,165,170,179,180)
-country_ids <- c(12)
-forecast_list = Arab_forecast_1 %>% filter(index <= 12 & Year==2014)
+country_ids <- c(180)
+forecast_list = Arab_forecast_1 %>% filter(index == 179 & Year==2014)
 #overall_list = list()
 
 for (reps in 1:5) {
   Arab_forecast_1 <- Arab_forecast[1:187,]
   for (country in country_ids) {
     Arab_forecast_1 <- Arab_forecast[1:187,] #test test test 
-      for (n in 2015:2035) {
+      for (n in 2015:2030) {
   # Arab_forecast_1 must be amended each time
   # Variable one year prediction for index 3 with regression equations and noise (normal)
       # Beginning with 2014 date and then increasing each year by n
@@ -168,6 +165,7 @@ new_Two.Year.Conflict.Intensity.Trend <- ((as.numeric(as.character(subset_Arab$H
 
 # Add Noise - No variables have negative minimum values just to note
 Arab_country <- Arab_forecast_1 %>% filter(index == country) #Should this only be from the observed data
+Arab_country
 #
 # If mean is 0 then possibility of huge negative values that for example made new Mobile noise negative
 #
@@ -184,8 +182,7 @@ new_Trade.Percent.GDP_noise <- as.numeric(new_Trade.Percent.GDP) + sample(Arab_T
 # Enforce non-negativity constraints 
 vars_values <- c(new_Mobile.Cell.Subs_noise, new_Population.Density_noise, new_Percent.Border.Conflict_noise,
                  new_Fertility.Rate_noise, new_Trade.Percent.GDP_noise)
-vars_names <- c("new_Mobile.Cell.Subs_noise", "new_Population.Density_noise", "new_Percent.Border.Conflict_noise",
-                "new_Fertility.Rate_noise", "new_Trade.Percent.GDP_noise")
+vars_names <- c("new_Percent.Border.Conflict_noise")
 # Non Negativity 
 for (i in 1:length(vars_values)) {
   if (vars_values[i] <= 0 | is.na(vars_values[i])) {
@@ -208,6 +205,8 @@ if (new_Population.Density_noise > Population.Density_max) {
 # Percent Border Conflict 
 if (new_Percent.Border.Conflict_noise > Percent.Border.Conflict_max) {
   new_Percent.Border.Conflict_noise <- Percent.Border.Conflict_max
+} else if (new_Percent.Border.Conflict_noise < 0) {
+  new_Percent.Border.Conflict_noise <- 0
 }
 
 # Fertility Rate Restrictions
@@ -229,10 +228,6 @@ countryy <- country
 new_row <- data.frame(countryy, yearr, new_Mobile.Cell.Subs_noise, new_Population.Density_noise, new_Percent.Border.Conflict_noise,
                       new_Government.1, new_Government.3, new_Government.4, new_Government.5, 
                       new_Fertility.Rate_noise, new_Trade.Percent.GDP_noise,new_Two.Year.Conflict.Intensity.Trend, sim)
-data.frame(countryy,yearr,new_Mobile.Cell.Subs_noise,new_Population.Density_noise, new_Percent.Border.Conflict_noise,
-           new_Government.1,new_Government.3,new_Government.4,new_Government.5,
-           new_Fertility.Rate_noise,new_Trade.Percent.GDP_noise,new_Two.Year.Conflict.Intensity.Trend)
-new_Two.Year.Conflict.Intensity.Trend
 names(new_row) <- c(names(Arab_country)[1:12], 'Rep')
 Arab_country <- rbind.all.columns(Arab_country, new_row)
 Arab_country[which(Arab_country$Year==2014),'Rep'] <- sim
@@ -375,4 +370,4 @@ View(forecast_list %>%
        arrange(index) %>%
        select(index, Year, HIIK.Conflict.Intensity, Conflict_Status, transition.prob, random.draw, Rep))
 
-write.csv(forecast_list, file = "Arab_3_repstofive_22dec.csv")
+write.csv(forecast_list, file = "C:/Users/ZKane/OneDrive/Documents/KaneThesis/Forecasting/Arab results/Original/Arab_180_repstofive_thirtyyears_4jan.csv")
