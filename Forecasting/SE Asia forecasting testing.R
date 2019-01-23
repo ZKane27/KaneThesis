@@ -28,6 +28,7 @@ SE_Asia.cols <- c("index","Year","Internet.Users","Life.Expectancy","Mobile.Cell
                   "Trade.percent.GDP","Freedom.Score","GDP.Per.Capita","Population.Density", "HIIK.Conflict.Intensity")
 
 SE_Asia_forecast <- SE_Asia_final %>% dplyr::select_(.dots = SE_Asia.cols)
+#write.csv(SE_Asia_forecast, file = "C:/Users/ZKane/OneDrive/Documents/KaneThesis/Forecasting/SE Asia Results/original_forecast_SE_Asia_data.csv")
 
 # Fix Factor Variables
 
@@ -92,6 +93,23 @@ detach(SE_Asia_forecast)
 Conflict_Status <- ifelse(as.numeric(as.character(SE_Asia_forecast$HIIK.Conflict.Intensity)) >= 3, 1, 0)
 SE_Asia_forecast$Conflict_Status <- Conflict_Status
 #View(SE_Asia_forecast)
+# SE_Asia_residuals <- cbind(SE_Asia_forecast$index,SE_Asia_forecast$Year, MASS::studres(SE_Asia_Internet.Users_reg), MASS::studres(SE_Asia_Life.Expectancy_reg), 
+#                            MASS::studres(SE_Asia_Arable.Lands_reg), MASS::studres(SE_Asia_Mobile.Cell.Subs_reg),
+#                            MASS::studres(SE_Asia_Infant.Mortality.Rate_reg), MASS::studres(SE_Asia_Population.Growth_reg),
+#                            MASS::studres(SE_Asia_Average.Border.Conflict_reg), MASS::studres(SE_Asia_Population.Density_reg),
+#                            MASS::studres(SE_Asia_GDP.Per.Capita_reg), MASS::studres(SE_Asia_Trade.percent.GDP_reg),
+#                            MASS::studres(SE_Asia_Freedom.Score_reg), MASS::studres(SE_Asia_Freshwater.per.Capita_reg),
+#                            MASS::studres(SE_Asia_Military.Expend.GDP_reg))
+SE_Asia_residuals <- cbind(SE_Asia_forecast$index,SE_Asia_forecast$Year, (SE_Asia_Internet.Users_residuals), (SE_Asia_Life.Expectancy_residuals), 
+(SE_Asia_Arable.Lands_residuals), (SE_Asia_Mobile.Cell.Subs_residuals),
+(SE_Asia_Infant.Mortality.Rate_residuals), (SE_Asia_Population.Growth_residuals),
+(SE_Asia_Average.Border.Conflict_residuals), (SE_Asia_Population.Density_residuals),
+(SE_Asia_GDP.Per.Capita_residuals), (SE_Asia_Trade.percent.GDP_residuals),
+(SE_Asia_Freedom.Score_residuals), (SE_Asia_Freshwater.per.Capita_residuals),
+(SE_Asia_Military.Expend.GDP_residuals))
+#write.csv(SE_Asia_residuals, file = "C:/Users/ZKane/OneDrive/Documents/KaneThesis/Forecasting/SE Asia Results/SE_asia_sturesiduals.csv")
+summary(SE_Asia_residuals)
+summary(SE_Asia_GDP.Per.Capita_residuals)
 #
 # Define conversion equation from log odds to probability, also other relevant equations 
 logit2prob <- function(logit){
@@ -201,7 +219,7 @@ SE_Asia_forecast_1 <- SE_Asia_forecast[1:308,]
 SE_Asia_forecast_1$index
 table(SE_Asia_forecast_1$index)
 #country_ids <- c(13,19,24,29,35,45,57,75,76,87,90,100,101,107,108 112 114 124 127 136 143 146 151 159 161 163,176,178)
-country_ids <- c(178)
+country_ids <- c(151)
 forecast_list = SE_Asia_forecast_1 %>% filter(index == 178 & Year==2014)
 #overall_list = list()
 
@@ -502,7 +520,7 @@ View(forecast_list %>%
        arrange(index) %>%
        select(index, Year, HIIK.Conflict.Intensity, Conflict_Status, transition.prob, random.draw, Rep))
 
-write.csv(forecast_list, file = "C:/Users/ZKane/OneDrive/Documents/KaneThesis/Forecasting/SE Asia Results/Original/SE_Asia_178_repstofive_thirtyyears_14jan.csv")
+write.csv(forecast_list, file = "C:/Users/ZKane/OneDrive/Documents/KaneThesis/Forecasting/SE Asia Results/Original/SE_Asia_151_repstofive_thirtyyears_14jan.csv")
 
 
 

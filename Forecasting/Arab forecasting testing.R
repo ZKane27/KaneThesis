@@ -54,6 +54,12 @@ detach(Arab_forecast)
 # Generate Conflict Status Binary Var
 Conflict_Status <- ifelse(as.numeric(as.character(Arab_forecast$HIIK.Conflict.Intensity)) >= 3, 1, 0)
 Arab_forecast$Conflict_Status <- Conflict_Status
+#Write residuals
+residuals_Arab <- cbind(Arab_forecast$index, Arab_forecast$Year, MASS::studres(Arab_Mobile.Cell.Subs_reg), MASS::studres(Arab_Population.Density_reg), 
+                        MASS::studres(Arab_Percent.Border.Conflict_reg), MASS::studres(Arab_Fertility.Rate_reg),
+                        MASS::studres(Arab_Trade.Percent.GDP_reg))
+write.csv(residuals_Arab, file = "C:/Users/ZKane/OneDrive/Documents/KaneThesis/Forecasting/Arab results/Arab_sturesiduals.csv")
+summary(residuals_Arab)
 #
 # Define conversion equation from log odds to probability, also other relevant equations 
 logit2prob <- function(logit){
@@ -350,8 +356,10 @@ forecast_list <- rbind.all.columns(forecast_list, forecast)
 #forecast_list[[reps]] <- forecast[reps]
 #print(transition_probability)
 
-    }
+      }
+    print(country)
   }
+  print(reps)
 }
 
 View(Arab_country)
