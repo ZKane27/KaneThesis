@@ -131,6 +131,11 @@ knitcitations::cite_options(citation_format = 'pandoc')
 #cite_options(citation_format = 'pandoc')
 ```
 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.loc='H', fig.align = "center", fig.pos = 'H')
+```
+
 # Introduction
 
 ## Background
@@ -326,11 +331,6 @@ Multiple imputation by chained equations (MICE) was the method used to impute th
   * recurrence, all interesting parts can be reached infinitely often at least from almost all starting points
   
 The first step in filling in the initial missing data observations was checking to see if the MICE algorithm was converging for each region. Van Burren identified there being no clear-cut method for determining whether the MICE algorithm has converged but that suitable imputations can be spotted from plotting one or more parameters versus the iteration number. The means and standard deviations were plotted for each variable's imputation streams. Healthy converges were categorized by freely intermingled different streams, without showing any trends and the variance between different sequences not being larger than the variance within each individual sequence. Below are an example of a healthy convergence when imputing freshwater per capita in South East Asia. 
-
-```{r healthy convergence, eval = TRUE, fig.cap = 'Healhty-Convergence of the MICE Algorithm for Freshwater per Capita in South East Asia',echo=FALSE}
-load("C:/Users/ZKane/OneDrive/Documents/KaneThesis/healthy_convergence.RData")
-
-```
 
 After looking at MICE applied to this analysis's data and seeing previous research's MICE convergences, around 20 iterations there was sufficient convergence by the algorithm. Moving forward each imputation conducted was run for 20 iterations. MICE allows for several different imputation techniques to be specifically applied to each variable every pass. _m_ of these chains are calculated in parallel, and after around 15-20 iterations for one regression chain, the regression coefficients for each missing variables' models are likely to converge (CITE burren page 116). MICE utilizes the columns of fully observed data in these chains. Imputing with a subset of only the missing data or simplified data set may deprive the MICE algorithm of information from the observed data. For this reason, each imputation was performed with the missing and complete columns of data. Multiple imputation procedurally will impute the data, analyze each imputed data set separately, and pool the results. The initial imputation began with investigating which MICE method resulted in the data most similar to the distribution of observed data. The five mice packages tested are shown in Table XX. 
 
@@ -654,9 +654,24 @@ Table \@ref(tab:weakSEmodels) shows that Singapore and Timor-Leste both containe
 
 The regional, generic imputation style future alternative model was first run with only operational boundaries constraining the values of each variable of interest. The data's relationships and injected noise was able to determine the directions of each nation's future conflict transitions. To evaluate the model's statistically possibility three metrics were calculated for each repetition and averaged to understand the differences between future conflict timelines and the observed historic data for a nation as well as compare individual alternative futures. Each evaluation metric was calculated for the past ten years of observed data and future sixteen years of projected conflicts status. The rates of transitions were found over each past or future time period by counting the times a nation transitioned conflict status divided by the number of years in that period. For example, if a nation remained in conflict for the entirety of the projected future years then it would have transitioned zero times over sixteen years. Its rate of transitions for that nation's single future would be zero ($\frac{0}{16}$). The rates of transitions give insight into how closely or off the future alternatives are from the historic rates of conflict beginnings and stoppages in a specific nation. The conflict likelihood was calculated similarly but just by counting the number of years in conflict divided by the total years in that period of time. By finding the likelihood of each nation's alternative future, comparing the models' conflict likelihoods provides the possibility of that future alternative. Expanding on this idea, the most recent conflict likelihoods were calculated for the three most recent years of observed data and the first three future projected conflict statuses. Comparing the most recent conflict likelihood gives insight into the more recent similarities and differences that future alternatives predict versus reality. 
 
-The Arab region in the past ten years has experienced 98 violent conflicts across seventeen countries: Algeria,	Bahrain, Egypt, Iraq,	Jordan,	Kuwait,	Lebanon, Libya, Morocco,	Oman,	Qatar,	Saudi Arabia,	Syria,	Tunisia,	United Arab Emirates,	West Bank, and	Yemen. The generic imputation driven forecasting model projected country conflict from 2015 to 2030. The model repeatedly projected future conflict five times to create five individual alternative futures for each country. The average predicted country conflicts across all five futures was 134.2 violent conflicts for the first ten years of future data. The associated minimum and maximum conflicts for a single future's total ten year conflicts were 125 and 145 respectively. Even on the lower end of projected future conflicts, there appears to be a larger estimates of conflicts that the data driven model predicts for the Arab region. The variable behavior that appeared to indicate a tendency for conflict was low fertility rate, low trade (\% of GDP), high mobile cell subscriptions, high population density, and high percent border conflict. These characteristics seemed common between the countries that experienced longer periods in conflict. One more observation of the data driven model is only one of the five produced alternative futures predicted that Algeria, a country historically in a state of conflict for the past ten years would remain in conflict. The other four futures generally predicted that Algeria would transfer out of conflict right away (2015) for about three to four years and then return to a state of conflict. 
+The Arab region in the past ten years has experienced 98 violent conflicts across seventeen countries: Algeria,	Bahrain, Egypt, Iraq,	Jordan,	Kuwait,	Lebanon, Libya, Morocco,	Oman,	Qatar,	Saudi Arabia,	Syria,	Tunisia,	United Arab Emirates,	West Bank, and	Yemen. The generic imputation driven forecasting model projected country conflict from 2015 to 2030. The model repeatedly projected future conflict five times to create five individual alternative futures for each country. The average predicted country conflicts across all five futures was 134.2 violent conflicts for the first ten years of future data. The associated minimum and maximum conflicts for a single future's total ten year conflicts were 125 and 145 respectively. Even on the lower end of projected future conflicts, there appears to be a larger estimates of conflicts that the data driven model predicts for the Arab region. 
 
-```{r}
+```{r origArabconficts, echo=FALSE, fig.cap="\\label{plot:ArabOrigConflicts}Arab Region's Original Alternative Futures' Avearged Yearly Conflicts", cache=TRUE, fig.width = 5, fig.height = 4}
+orignal_conflict_summary <- data.frame(Year=(2004:2030),
+                           Conflicts = c(5,	7,	6,	6,	5,	7,	9,	14,	13,	13,	13,	13.2,	12.8,	9.2,	7.6,	11.2,	12.8,	12.4,	11.8,	13.8,	14.8,	14.6,	14,	14.2,	15.2,	15.8,	14.8))
+
+orig_conflicts_plotted <- ggplot(data=orignal_conflict_summary, aes(x=Year, y=Conflicts), height = 100) +
+   geom_line() +
+   geom_point() +
+   labs(y="Avearge Arab Conflicts") +
+   ylim(0,16) 
+   
+orig_conflicts_plotted + theme_classic()
+```
+
+The variable behavior that appeared to indicate a tendency for conflict was low fertility rate, low trade (\% of GDP), high mobile cell subscriptions, high population density, and high percent border conflict. These characteristics seemed common between the countries that experienced longer periods in conflict. One more observation of the data driven model is only one of the five produced alternative futures predicted that Algeria, a country historically in a state of conflict for the past ten years would remain in conflict. The other four futures generally predicted that Algeria would transfer out of conflict right away (2015) for about three to four years and then return to a state of conflict. These trends are seen in Figure \@ref(plot:Algeria) where each repition's HIIK conflict score from the past and future are plotted against time.
+
+```{r AlgeriaHIIK, echo=FALSE, fig.cap="\\label{plot:Algeria}Algeria's Original Alternative Futures' Repeated HIIK Conflict Intensities", cache=TRUE}
 algeria_hiik <- data.frame(Year=rep(c(2004:2030),5),
                            Repition=rep(c("1", "2","3","4","5"), each=27),
                            HIIK1=c(4,4,4,4,3,3,4,4,3,4,4,1,0,0,5,1,0,
@@ -699,199 +714,80 @@ p5 <- ggplot(data=algeria_hiik, aes(x=Year, y=HIIK5, group=5)) +
    ylim(0,5) +
    theme_classic()
 
+gridExtra::grid.arrange(p1,p2,p3,p4,p5,nrow=3, 
+                        heights = c(50,50,50))
+```
+
+The average percentage changes for the three future alternative evaluation measures were the rate of transitions increased 15.123\% across all the countries and replications with a standard deviation of 70.591. The conflict likelihood increased an average of 82.716\% with a 172.506 standard deviation from the past ten years of country conflict likelihoods. The most recent (three year) conflict likelihood only decreased by 7.451\% with a standard deviation of 43.197. It seems like the closer projected future conflicts didn't deviate too far from the observed recent conflict realities, but the further away the futures were from the observed historical data, the larger the conflict likelihoods and rates of transitions became with wider bounds as well. This is partially the difficult with making predictions on projected future data. There is no guarantee the future will or should look like the past. 
+
+The South East Asia regional conflict transition prediction model was applied to the generically imputation style forecasted data set. In the past ten years, the South East Asia region has experienced 136 violent conflicts throughout its 28 nations. With the developed alternative futures from letting the data's relationships dictate their own trends over time for five replications, an average of 97.2 violent conflicts were predicted for the first ten years of projected future conflict statuses. There was a minimum of 91 and maximum of 103 violent conflicts predicted by an individual alternate future replication, and interestingly, the same method applied to build a model in a different region outputted a different trend of overall decade conflict trend towards peace. 
+
+```{r origSEconficts, echo=FALSE, fig.cap="\\label{plot:SEAsiaOrigConflicts}South East Asia Region's Original Alternative Futures' Avearged Yearly Conflicts", cache=TRUE, fig.width = 5, fig.height = 4}
+orignal_conflict_summary <- data.frame(Year=(2004:2030),
+                           Conflicts = c(13,	9,	13,	11,	10,	12,	11,	13,	16,	15,	13,	4.6,	3.6,	8.6,	7.8,	6.6,	9.8,	11,	9.2,	9.4,	14.2,	12.4,	11.4,	10,	13.4,	13,	12.6))
+
+orig_conflicts_plotted <- ggplot(data=orignal_conflict_summary, aes(x=Year, y=Conflicts), height = 100) +
+   geom_line() +
+   geom_point() +
+   labs(y="Avearge SE Asia Conflicts")+
+   ylim(0,16) 
+   
+orig_conflicts_plotted + theme_classic()
+```
+
+The recognizable variables' behaviors that were common to country's with futures of prolonged non violence were no border conflict, low border conflict, low arable lands, higher freedom scores, and high trade (\% of GDP). Of all the replicated future alternatives, as opposed to the Arab region which observed multiple countryies with zero future rates of transitions meaning they wouldn't change conflict statuses over the course of the future time period, the South East Asia region future data consisted on higher rates of transitions. Only Laos and Tonga experienced an alternative future with extended periods of peace and extremely low rates of transitions. 
+
+```{r LaosHIIK, echo=FALSE, fig.cap="\\label{plot:laos}Laos's Original Alternative Futures' Repeated HIIK Conflict Intensities", cache=TRUE}
+laos_hiik <- data.frame(Year=rep(c(2004:2030),5),
+                           Repition=rep(c("1", "2","3","4","5"), each=27),
+                           HIIK1=c(4,4,3,3,2,3,2,3,3,2,2,0,0,1,0,0,0,5,0,0,0,2,0,5,0,0,0),
+                           HIIK2=c(4,4,3,3,2,3,2,3,3,2,2,0,0,0,1,1,4,0,0,0,0,0,3,0,0,1,0),
+                           HIIK3=c(4,4,3,3,2,3,2,3,3,2,2,1,0,0,0,0,2,2,0,0,3,0,0,0,0,4,5),
+                           HIIK4=c(4,4,3,3,2,3,2,3,3,2,2,0,0,0,0,0,3,5,0,0,5,2,5,0,5,0,5),
+                           HIIK5=c(4,4,3,3,2,3,2,3,3,2,2,3,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0))
+library(gridExtra)
+library(ggplot2)
+# Basic line plot with points
+p1 <- ggplot(data=laos_hiik, aes(x=Year, y=HIIK1, group=1)) +
+   geom_line()+
+   geom_point() +
+   labs(y="HIIK 1") +
+   theme_classic()
+
+p2 <- ggplot(data=laos_hiik, aes(x=Year, y=HIIK2, group=2)) +
+   geom_line()+
+   geom_point() +
+   labs(y="HIIK 2")+
+   theme_classic()
+
+p3 <- ggplot(data=laos_hiik, aes(x=Year, y=HIIK3, group=3)) +
+   geom_line()+
+   geom_point() +
+   labs(y="HIIK 3")+
+   theme_classic()
+
+p4 <- ggplot(data=laos_hiik, aes(x=Year, y=HIIK4, group=4)) +
+   geom_line()+
+   geom_point() +
+   labs(y="HIIK 4")+
+   theme_classic()
+
+p5 <- ggplot(data=laos_hiik, aes(x=Year, y=HIIK5, group=5)) +
+   geom_line()+
+   geom_point() +
+   labs(y="HIIK 5")+
+   ylim(0,5) +
+   theme_classic()
 
 gridExtra::grid.arrange(p1,p2,p3,p4,p5,nrow=3, 
                         heights = c(50,50,50))
 ```
 
-The average percentage changes for the three future alternative evaluation measures were the rate of transitions increased 15.123\% across all the countries and replications with a standard deviation of 70.591. The conflict likelihood increased an average of 82.716\% with a 172.506 standard deviation from the past ten years of country conflict likelihoods. The most recent (three year) conflict likelihood only decreased by 7.451\% with a standard deviation of 43.197. It seems like the closer projected future conflicts didn't deviate too far from the observed recent conflict realities, but the further away the futures were from the observed historical data, the larger the conflict likelihoods and rates of transitions became with wider bounds as well. This is partially the difficult with making predictions on projected future data. There is no guarantee the future will or should look like the past. \@ref(tab:ArabSummary)
-
-```{r ArabSummary, results='asis', eval=TRUE}
-library(kableExtra)
-stats <- matrix(c(0,0.15,0.1875,0,0.625, 0.725, 1, 1,
-                  0,0,0,0.0909, 1, 1, 1, 0.5455,
-                  0.0625,0.2125,0.5,0.2727,0.5,0.7875,0.9375,0.7272,
-                  0.0625,0.275,0.5625,0,0.4375,0.7,0.875,1,
-                  0.125,0.3,0.5625,0.2727,0.4375,0.6875,0.875,0.5455,
-                  0,0.025,0.125,0.0909,0.875,0.975,1,0.3636,
-                  0,0.075,0.25,0,0.625,0.9,1,1,
-                  0.125,0.3125,0.4375,0.0909,0.5,0.6625,0875,0.3636,
-                  0,0.2375,0.4375,0.2727,0.2625,0.7375,1,0.5455,
-                  0.125,0.25,0.375,0.1818,0.5625,0.7375,0.875,0.0909,
-                  0.1875,0.2375,0.3125,0,0.6875,0.7375,0.8125,0,
-                  0,0.175,0.375,0.1818,0.625,0.7625,1,0.0909,
-                  0.0625,0.2,0.375,0.2727,0.5625,0.7375,0.875,0.4545,
-                  0,0.125,0.25,0.0909,0.75,0.875,1,0.3636,
-                  0.1575,0.2125,0.3125,0,0.625,0.675,0.6875,0,
-                  0.125,0.3,0.4375,0,0.5625,0.725,0.875,0,
-                  0.375,0.4125,0.4375,0,0.5625,0.5875,0.625,1), 
-                nrow = 17, ncol = 8, byrow = TRUE)
-second_stats <- matrix(c(0, 0.2, 1, 1, 
-                          1, 1, 1, 1,
-                         0.6667,0.8667,1,1,
-                         0,0.4667,1,1,
-                         0.6667,0.6667,0.6667,1,
-                         0.6667,0.9333,1,1,
-                         0.6667,0.9333,1,1,
-                         0.6667,0.8667,1,1,
-                         0.6667,0.7333,1,1,
-                         0.3333,0.6,0.6667,0,
-                         0.3333,0.6,0.6667,0,
-                         0,0.4,1,1,
-                         0,0.6,1,1,
-                         0.6667,0.8,1,1,
-                         0.3333,0.3333,0.3333,0,
-                         0.3333,0.7333,1,0,
-                         1,1,1,1
-                         ),
-                       nrow = 17, ncol = 4, byrow = TRUE)
-x <- cbind(c("Algeria", "Bahrain","Egypt",
-             "Iraq", "Jordan", "Kuwait",
-             "Lebanon","Libya","Morocco",
-             "Oman","Qatar","Saudi Arabia",
-             "Syria","Tunisia","United Arab Emirates",
-             "West Bank","Yemen"), stats)
-colnames(x) <- c("Country", rep(c("Min", "Average", "Max", ""), 2))
-
-y <- cbind(c("Algeria", "Bahrain","Egypt",
-             "Iraq", "Jordan", "Kuwait",
-             "Lebanon","Libya","Morocco",
-             "Oman","Qatar","Saudi Arabia",
-             "Syria","Tunisia","United Arab Emirates",
-             "West Bank","Yemen"), second_stats)
-colnames(y) <- c("Country", "Min","Average","Max", "")
-
-kable(x, align = "c", "latex", booktabs = T, caption = "\\label{tab:ArabSummary}Arab Region Average Alternate Futures' Performances") %>%
-  add_header_above(c(" ", "FROT[note]" = 3, "PROT[note]" = 1, "FCL[note]" = 3, "PCL[note]" = 1)) %>%
-  add_footnote(c("Future average rate of transitions",
-                 "Past ten years rate of transitions",
-                 "Future conflict likelihood",
-                 "Past ten years conflict likelihood"),
-               notation = "symbol") %>%
-  kable_styling(font_size = 8, bootstrap_options = "striped", position = "center") 
-
-kable(y, align = "c", "latex", booktabs = T,) %>%
-  add_header_above(c(" ", "FRCL[note]" = 3, "PRCL[note]" = 1)) %>%
-  add_footnote(c("Most recent future three years conflict likelihood",
-                 "Most recent past three years conflict likelihood"),
-               notation = "symbol") %>%
-  kable_styling(font_size = 7, bootstrap_options = "striped", position = "center") 
-
-
-```
-
-
-The South East Asia regional conflict transition prediction model was applied to the generically imputation style forecasted data set. In the past ten years, the South East Asia region has experienced 136 violent conflicts throughout its 28 nations. With the developed alternative futures from letting the data's relationships dictate their own trends over time for five replications, an average of 97.2 violent conflicts were predicted for the first ten years of projected future conflict statuses. There was a minimum of 91 and maximum of 103 violent conflicts predicted by an individual alternate future replication, and interestingly, the same method applied to build a model in a different region outputted a different trend of overall decade conflict trend towards peace. The recognizable variables' behaviors that were common to country's with futures of prolonged non violence were no border conflict, low border conflict, low arable lands, higher freedom scores, and high trade (\% of GDP). Of all the replicated future alternatives, as opposed to the Arab region which observed multiple countryies with zero future rates of transitions meaning they wouldn't change conflict statuses over the course of the future time period, the South East Asia region future data consisted on higher rates of transitions. Only Laos and Tonga experienced an alternative future with extended periods of peace and extremely low rates of transitions. The model compared to the original ten years of observed data in the region on average across all countries and repetitions predicted a 104.61\% increase in the rate of transitions with a standard deviation of 121.941. The conflict likelihood for the future of the region only increased by 18.989\% with a standard deviation of 103.105. The most recent conflict likelihood comparison saw a decrease of 38.095\% with an associated standard deviation of 49.546. 
-
-```{r, results='asis', eval=TRUE}
-library(kableExtra)
-stats <- matrix(c(0.375,0.4792,0.5,0.1818,0.375,0.3958,0.4375,0.9091,
-                  0.25,0.3229,0.4375,0.0909,0.1875,0.2917,0.4375,0.0909,
-                  0.125,0.375,0.5,0.0909,0.0625,0.2813,0.5,0.1818,
-                  0.375,0.4896,0.6875,0.1818,0.3125,0.3958,0.4375,0.7273,
-                  0.3125,0.3854,0.4375,0.1818,0.3125,0.3542,0.375,0.9091,
-                  0.25,0.3125,0.375,01818,0.1875,0.2396,0.3125,0.1818,
-                  0.375,0.4896,0.5625,0,0.375,0.4375,0.5,0,
-                  0.375,0.4479,0.5,0,0.3125,0.3854,0.4375,1,
-                  0.4375,0.5104,0.625,0,0.3125,0.4271,0.5,0,
-                  0.0625,0.2604,0.5625,0.4545,0.0625,0.1667,0.375,0.6364,
-                  0.3125,0.3333,0.375,0.0909,0.1875,0.3021,0.375,0.3636,
-                  0.3125,0.5104,0.875,0.2727,0.1875,0.3958,0.5,0.2727,
-                  0.375,0.5104,0.9375,0,0.375,0.4375,0.5,0,
-                  0.375,0.4479,0.5,0,0.3125,0.3646,0.375,0,
-                  0.0625,0.3542,0.625,0,0.0625,0.2813,0.5,1,
-                  0.375,0.4271,0.4375,0.0909,0.3125,0.4063,0.4375,0.9091,
-                  0.4375,0.4896,0.5,0.0909,0.375,0.4063,0.4375,0.3636,
-                  0.5,0.6875,0.875,0,0.375,0.4688,0.5,1,
-                  0.25,0.375,0.5,0.1818,0.125,0.3021,0.5,0.0909,
-                  0.4375,0.4583,0.5625,0,0.25,0.3542,0.4375,0,
-                  0.4365,0.4792,0.5,0.1818,0.25,0.4271,0.5,0.0909,
-                  0.3125,0.4375,0.5,0.3636,0.1875,0.3333,0.5,0.8182,
-                  0.3125,0.3438,0.4375,0,0.1875,0.3021,0.4375,1,
-                  0.4375,0.4792,0.5,0.3636,0.3125,0.4063,0.5,0.3636,
-                  0,0.0936,0.25,0.1818,0,0.09375,0.25,0.0909,
-                  0.25,0.3646,0.5,0,0.25,0.3542,0.5,0,
-                  0.375,0.4063,0.5,0.2727,0.25,0.3646,0.4375,0.3636
-                  ), 
-                nrow = 28, ncol = 8, byrow = TRUE)
-second_stats <- matrix(c(0,0.2778,0.3333,1,
-                         0,0.0556,0.3333,0,
-                         0.3333,0.3889,0.6667,0.6667,
-                         0,0.1111,0.3333,1,
-                         0,0.1111,0.3333,1,
-                         0,0,0,0,
-                         0,0.3333,0.6667,0,
-                         0,0.1667,0.3333,1,
-                         0,0.1667,0.3333,1,
-                         0.3333,0.3889,0.6667,0,
-                         0,0.0556,0.3333,0.3333,
-                         0,0.0556,0.3333,1,
-                         0.3333,0.3889,0.6667,0.6667,
-                         0,0.1667,0.3333,0,
-                         0,0.1667,0.3333,0,
-                         0,0.2778,0.3333,1,
-                         0,0.0556,0.3333,0.6667,
-                         0,0.2778,0.3333,1,
-                         0.3333,0.3333,0.3333,1,
-                         0,0.2222,0.3333,0.3333,
-                         0.3333,0.3333,0.3333,0,
-                         0,0.3333,0.6667,0,
-                         0,0.1667,0.6667,0.6667,
-                         0,0.1111,0.3333,1,
-                         0.3333,0.3889,0.6667,0.3333,
-                         0,0,0,0,
-                         0,0.1111,0.6667,0,
-                         0,0.0556,0.3333,1
-                         ),
-                       nrow = 28, ncol = 4, byrow = TRUE)
-x <- cbind(c("Bangladesh", "Bhutan","Brunei Darussalam",
-             "Cambodia", "China", "North Korea",
-             "Fiji","India","Indonesia",
-             "Kiribati","Laos","Malaysia",
-             "Maldives","Micronesia","Mongolia",
-             "Myanmar","Nepal", "Papua New Guinea",
-             "Philippines","Samoa","Singapore",
-             "Solomon Islands","Sri Lanka", "Thailand",
-             "Timor-Leste","Tonga","Vanuatu","Vietnam"), stats)
-colnames(x) <- c("Country", rep(c("Min", "Average", "Max", ""), 2))
-
-y <- cbind(c("Bangladesh", "Bhutan","Brunei Darussalam",
-             "Cambodia", "China", "North Korea",
-             "Fiji","India","Indonesia",
-             "Kiribati","Laos","Malaysia",
-             "Maldives","Micronesia","Mongolia",
-             "Myanmar","Nepal", "Papua New Guinea",
-             "Philippines","Samoa","Singapore",
-             "Solomon Islands","Sri Lanka", "Thailand",
-             "Timor-Leste","Tonga","Vanuatu","Vietnam"),second_stats)
-colnames(y) <- c("Country", "Min","Average","Max", "")
-
-kable(x, align = "c", "latex", booktabs = T, caption = "\\label{tab:SEAsiaSummary}SE Asia Region Average Alternate Futures' Performances") %>%
-  add_header_above(c(" ", "FROT[note]" = 3, "PROT[note]" = 1, "FCL[note]" = 3, "PCL[note]" = 1)) %>%
-  add_footnote(c("Future average rate of transitions",
-                 "Past ten years rate of transitions",
-                 "Future conflict likelihood",
-                 "Past ten years conflict likelihood"),
-               notation = "symbol") %>%
-  kable_styling(font_size = 8, bootstrap_options = "striped", position = "center") 
-
-kable(y, align = "c", "latex", booktabs = T,) %>%
-  add_header_above(c(" ", "FRCL[note]" = 3, "PRCL[note]" = 1)) %>%
-  add_footnote(c("Most recent future three years conflict likelihood",
-                 "Most recent past three years conflict likelihood"),
-               notation = "symbol") %>%
-  kable_styling(font_size = 8, bootstrap_options = "striped", position = "center") 
-
-
-```
-
-The South East Asia region overall saw the smallest average percentage change in historic conflict likelihood and was the least close to historic rates of transitions. Although the two regions are significantly different, they both predicted increased average percentage of changes in rate of transitions and conflict likelihood but on average predicted smaller likelihoods of more recent conflict. Both of these results based on the data driven alternative futures models are used as the base line of comparison for the regional questions analyzed in sections 4.2 and 4.3.
+The model compared to the original ten years of observed data in the region on average across all countries and repetitions predicted a 104.61\% increase in the rate of transitions with a standard deviation of 121.941. The conflict likelihood for the future of the region only increased by 18.989\% with a standard deviation of 103.105. The most recent conflict likelihood comparison saw a decrease of 38.095\% with an associated standard deviation of 49.546. The South East Asia region overall saw the smallest average percentage change in historic conflict likelihood and was the least close to historic rates of transitions. Although the two regions are significantly different, they both predicted increased average percentage of changes in rate of transitions and conflict likelihood but on average predicted smaller likelihoods of more recent conflict. Both of these results based on the data driven alternative futures models are used as the base line of comparison for the regional questions analyzed in sections 4.2 and 4.3.
 
 ## Arab Nations' Regional Scenarios
 
 The three regional scenarios were tested using modified versions of the purely data driven future alternative model. With the previously mentioned scripted behavior of the percentage of border conflicts of a given nation, the first regional scenario was tested to understand the regional impact of peaceful bordering nations. Despite the logical rational that peace besets peace, the results of this regional scenario were an overwhelming majority of countries entering conflict and staying in conflict for the duration of the future sixteen years. The peaceful borders' future alternatives, averaged across all five replications forecasted 184.6 yearly instances of violent conflicts in countries over the first ten future years. This was over double of the 98 observed instances of countries in violent conflict for the most recent ten years. The future conflicts with enacted peaceful bordering nations were about 50 conflicts more than the original data driven future conflict predicted. Looking closer into each individual country, only two countries across all five repetitions experience a year not in a state of conflict. Oman, Qatar, and United Arab Emirates entered states of non conflict only within the first three years of future data, and all other countries' conflict statuses were in conflict. The noticeable variable trends associated with all of the repeated states of conflict despite supposed peaceful bordering nations were low fertility rates, high population densities, and high mobile cell subscribers. Conflict transitions were influenced only when moderate levels of population density, fertility rate, trade (\% of GDP), and mobile cell subscribers existed. The peace in bordering countries does not appear to bring peace to the Arab nations themselves. Interestingly enough, the peaceful bordering nations lead the alternative futures to be have different average percentage of change from the observed historical data in the Arab region than the data driven original alternative future model. The peaceful border nations scenario had a negative average 57.243\% change of the rate of transitions, a 118.676\% increase in conflict likelihoods, and the more recent conflict transitions increase by 18.824\%. Compared to the purely data driven model, preset peaceful regional predicted greater average percentage changes in each of the three statistics. For the most part, increased peace in bordering Arab countries generated alternative futures of increased violent conflicts and minimal conflict transitions out of conflict. 
-
-
 
 The second scenario of complete regional democratic governence show in an improved the overall Arab regional conflict environment. There were an average of 130.2 yearly instances of nation's being a state of conflict over the first ten years of projected data. This was a slightly smaller estimate than the data driven model, but the influence of democracies was still higher than the total number of conflicts in the most recent ten years of observed data. However, the all democratic governments average conflicts produced was a smaller standard deviation than the original data driven model indicating a smaller range of ten year conflict estimates. Oman, Qatar, Bahrain, Kuwait, Lebanon, and Morocco all experienced alternative futures completely in conflict with no transitions out of conflict. The years with continued violent conflicts and no transitions out of conflict were explained by high mobile cell subscribers, high population density, high percent of bordering conflicts, low fertility rates, and low trade (\% of GDP). It appeared that there was no significant impact that prescribed democracies had on the overall conflicts within a region. This research's three conflict measures had similar average percentage changes as the original imputed style forecasting method: increased rates of transitions, conflict likelihoods, and more recent conflict likelihoods. The only statistics' averages and standard deviations that didn't increase from the dictated democratic regimes were the recent, three year conflict likelihoods which had only an average percentage decrease of 3.529\% and standard deviation 46.554. The imposed state of democracy only improved the model's ability to predict conflict likelihoods more closely to the regions previous three years of conflict likelihoods across all seventeen country. Oman, Lebanon, and Morocco all saw no percentage change across all five repetitions from the historic conflict transitions. This appears that with the influenced democracies, the model produced recent (three year) conflict transitions identical to the recent previous observed conflict transitions when a given nations spent more years in a state of conflict. The countries that experienced the largest differences from the historic conflict behaviors in transitions and rates of transitions were Kuwait, Libya, and Oman. Two of these countries, not surprisingly received repeated high occurrences of conflict prediction during at least one repetition and reassured the model's tendency and impact of democracies like the original data driven model to predict statuses of conflict over not in conflict within the Arab region.
 
@@ -943,10 +839,399 @@ In addition to expanding the variables considered to explain each region, an alt
 
 This research's imputed future alternatives generative method could still be developed upon in the same manner that univariate missing data imputation methods have been progressed. This research took an predicted point estimate plus noise approach to defining the yearly estimates of each variable, but Van Buuren (CITE) identified two other univariate imputation methods that incorporate more uncertainty: Bayesian multiple imputation and bootstrap multiple imputation. Both of these methods take the prediction plus noise formulation one step further by adding on parameter uncertainty. Expanding the imputation theory behind the alternative futures may be a possible area of expansion that this research could perpetuate. Incorporating more uncertainty into the method or testing an alternate future generation technique would only enhance decision makers knowledge towards developing of strategic and operational plans. 
 
+# Appendix A {-}
+
+## Variable Information
+
+```{r variableinfo, xtable, results='asis', eval=TRUE}
+
+variable <- c("BirthRate","DeathRate","FertilityRate","InternetUsers",
+              "LifeExpectancy","MobileCellSubscriptions",
+              "InfantMortalityRate",
+              "YouthPopulation","PopulationGrowth","RefugeeOrigin",
+              "ArableLand","ImprovedWater","PopulationDensity",
+              "Trade(% of GDP)", "Unemployment", "PctBC", "AvgBC", 
+              "BinBC", "EthnicDiversity","ReligiousDiversity",
+              "FreshWaterperCapita","GDPperCapita","MilitaryExpendGDP",
+              "RefugeeAsylum","CaloricIntake","2YrConflictIntensity",
+              "FreedomScore","FreedomTrend2Yr",
+              "FreedomTrend3Yr","FreedomTrend5Yr",
+              "DemGovType","GovernmentType","RegimeType")
+source <- c("World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "Developed from HIIK intensity levels and border information",
+            "Developed from HIIK intensity levels and border information",
+            "Developed from HIIK intensity levels and border information",
+            "Shallcross Database",
+            "Shallcross Database",
+            "Shallcross Database",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "World DataBank: World Development Indicators",
+            "UN Food and Agriculture Organization",
+            "Developed from HIIK intensity levels",
+            "Developed, Freedom House",
+            "Developed from freedom score",
+            "Developed from freedom score",
+            "Developed from freedom score",
+            "Developed from Government Type",
+            "Developed from polity variable",
+            "Shallcross Database"
+            )
+description <- c("Birth rate, crude (per 1,000 people)",
+                 "Death rate, crude (per 1,000 people)",
+                 "Fertility rate, total (births per woman)",
+                 "Internet users (per 100 people)",
+                 "Life expantancy at birth, total(years)",
+                 "Total mobile celluular subscriptions",
+                 "Mortality rate, infant (per  1,000 live births)",
+                 "Population ages 0-14 (% of total)",
+                 "Population growth (annual %)",
+                 "Refugee population by country or territory of origin",
+                 "Arable land (hectares per person)",
+                 "Improved water source (% of population with access)",
+                 "Population density (people per sq. km of land area",
+                 "Trade as a percentage of a country's GDP",
+                 "Unemployment, total (% of total labor force)(national estimate)",
+                 "Border conflict measure considering the percent of perimeter of broder shared with a country and the HIIK intensity level of broder sharing country",
+                 "Border conflict measure for the average HIIK conflict intensity level surrounding a country",
+                 "Border conflict indicator which indicates if at least one bordering nation is in a state of conflict",
+                 "Percent of dominant ethnic group",
+                 "Percent of dominant religious group",
+                 "Cubic meters, average of 2007,2012,2013 data",
+                 "GDP per capita growth (annual %)",
+                 "Military expenditure (% of GDP)",
+                 "Refugee population by country or territory of asylum",
+                 "Caloric intake (kcal/capita/day)",
+                 "Change in HIIK conflict intensity between current year of observation and HIIK intensity level of current year -2",
+                 "Combined average of normalized civil liberties and normalized political rights",
+                 "Difference between freedom scores of current year -2 and current year -1",
+                 "Difference between freedom scores of current year -3 and current year -1",
+                 "Difference between freedom score of current year -5 and current year -1",
+                 "Indicator variable denoting if an observation has a democratic government or not",
+                 "Mapping of original polity variable into six categories",
+                 "Static variable indicating the type of regime for a country")
+info <- data.frame(variable,source,description)
+info_table <- xtable::xtable(info)
+colnames(info_table) <- c("Variable","Source","Description")
+align(info_table) <- "|l|l|c|l|"
+bold <- function(x) {paste('{\\textbf{',x,'}}', sep ='')}
+print(info_table, comment = F, include.rownames=FALSE, table.placement = "H",
+     sanitize.colnames.function = bold, scalebox = '0.4')
+
+#info %>%
+#  mutate_all(linebreak) %>%
+#  kableExtra::kable("latex", booktabs = T, escape = F
+```
+
+## Regional Logistic Regression Models
+
+```{r Arabinconflict, xtable, results='asis', eval=TRUE}
+Estimate <- c(-5.5600,-0.0000,-0.0304,2.5943,-1.4569,-20.0807,-3.5082,-5.4795)
+Standard_Error <- c(2.2340,0.0000,0.0121,0.8891,0.7558,2662.8527,1.7299,1812.3045)
+z_value <- c(-2.29,-2.60,-2.51,-2.92,-1.93,-0.01,-2.03,-0.00)
+Prob <- c(0.0128,0.0093,0.0121,0.0035,0.0539,0.9940,0.0426,0.9976)
+in_conflict_Arab <- data.frame(Estimate, Standard_Error, z_value, Prob)
+in_conflict_table <- xtable(in_conflict_Arab, caption = "Arab Region In Conflict Model", digits=c(0,4,4,2,4))
+row.names(in_conflict_table) <- c("(Intercept)","MobileCellSubscriptions","PopulationDensity","PctBC","GovernmentType1","GovernmentType3",
+                                  "GovernmentType4","GovernmentType5")
+colnames(in_conflict_table) <- c("Estimate","Std. Error", "z value", "Pr(>|z|)")
+print(in_conflict_table, comment = F, include.rownames = TRUE, table.placement = "H",booktabs = T)
+
+```
+
+```{r Arabnotinconflict, xtable, results='asis', eval=TRUE}
+Estimate <- c(-0.8759,2.2693,-0.0978,17.3657)
+Standard_Error <- c(2.9677,1.3469,0.0379,5.4186)
+z_value <- c(-0.30,1.68,-2.58,3.20)
+Prob <- c(0.7679,0.0920,0.0098,0.0014)
+out_conflict_Arab <- data.frame(Estimate, Standard_Error, z_value, Prob)
+out_conflict_table <- xtable(out_conflict_Arab, caption = "Arab Region Not in Conflict Model", digits=c(0,4,4,2,4))
+row.names(out_conflict_table) <- c("(Intercept)","FertilityRate","Trade (% of GDP)",
+                                  "2YrConflictIntensity")
+colnames(out_conflict_table) <- c("Estimate","Std. Error", "z value", "Pr(>|z|)")
+print(out_conflict_table, comment = F, include.rownames = TRUE, table.placement = "H",booktabs = T)
+```
+
+```{r SEinconflict, xtable, results='asis', eval=TRUE}
+Estimate <- c(-79.0581,-0.0676,1.0474,-0.0000,0.0890,1.9660,3.7880,-2.1159,4.9459,0.0001,-10.2960,0.8437,-0.0001,-1.3044,-15.7118)
+Standard_Error <- c(27.0954,0.0354,0.3646,0.0000,0.0483,0.9138,1.3064,0.7494,1.9387,0.0000,3.2099,0.4707,0.0001,0.9971,1775.0073)
+z_value <- c(-2.92,-1.91,2.87,-2.03,1.85,2.15,2.90,-2.82,2.55,3.48,-3.21,1.79,-1.14,-1.31,-0.01)
+Prob <- c(0.0035,0.0562,0.0041,0.0427,0.0650,0.0314,0.0037,0.0047,0.0107,0.0005,0.0013,0.0731,0.2543,0.1908,0.9929)
+in_conflict_SE <- data.frame(Estimate, Standard_Error, z_value, Prob)
+in_conflict_table <- xtable(in_conflict_SE, caption = "South East Asia Region In Conflict Model", digits=c(0,4,4,2,4))
+row.names(in_conflict_table) <- c("(Intercept)","InternetUsers","LifeExpectancy","MobileCellSubscriptions","InfantMortalityRate",
+                                  "PopulationGrowth","ArableLand","AvgBC","BinBC","FreshWaterPerCapita",
+                                  "2YrConflictIntensity","MilitaryExpendGDP","GDPperCapita",
+                                  "RegimeTypeDemocratic","RegimeTypeEmergingTransitional")
+colnames(in_conflict_table) <- c("Estimate","Std. Error", "z value", "Pr(>|z|)")
+print(in_conflict_table, comment = F, include.rownames = TRUE, table.placement = "H",booktabs = T)
+```
+
+```{r SEnotinconflict, xtable, results='asis', eval=TRUE}
+Estimate <- c(5.3436,0.0000,-0.0632,5.9973,16.5140,-9.8479,3.9917,-1.5551,-0.0001,0.0026)
+Standard_Error <- c(2.3561,0.0000,0.0186,2.2442,3.6093,2.8880,3.9917,0.7725,0.0001,0.0011)
+z_value <- c(2.27,2.78,-3.39,2.67,4.58,-3.41,2.85,-2.01,-2.23,2.41)
+Prob <- c(0.0233,0.0054,0.0007,0.0075,0.0000,0.0006,0.0044,0.0441,0.0258,0.0159)
+out_conflict_SE <- data.frame(Estimate, Standard_Error, z_value, Prob)
+out_conflict_table <- xtable(out_conflict_SE, caption = "South East Asia Region Not in Conflict Model", digits=c(0,4,4,2,4))
+row.names(out_conflict_table) <- c("(Intercept)","MobileCellSubscriptions","Trade (% of GDP)",
+                                  "BinBC","2YrConflictIntensity","FreedomScore","RegimeTypeDemocratic",
+                                  "AvgBC","GDPperCapita","PopulationDensity")
+colnames(out_conflict_table) <- c("Estimate","Std. Error", "z value", "Pr(>|z|)")
+print(out_conflict_table, comment = F, include.rownames = TRUE, sanitize.text.function = function(x){x}, table.placement = "H",booktabs = T)
+```
 
 
+# Appendix B {-}
+
+```{r ArabSummary, results='asis', eval=TRUE, fig.pos='H'}
+knitr::opts_chunk$set(echo = FALSE, fig.loc='H', fig.align = "center", fig.pos = 'H')
+options(knitr.table.format = "latex") 
+library(kableExtra)
+stats <- matrix(c(0,0.15,0.1875,0,0.625, 0.725, 1, 1,
+                  0,0,0,0.0909, 1, 1, 1, 0.5455,
+                  0.0625,0.2125,0.5,0.2727,0.5,0.7875,0.9375,0.7272,
+                  0.0625,0.275,0.5625,0,0.4375,0.7,0.875,1,
+                  0.125,0.3,0.5625,0.2727,0.4375,0.6875,0.875,0.5455,
+                  0,0.025,0.125,0.0909,0.875,0.975,1,0.3636,
+                  0,0.075,0.25,0,0.625,0.9,1,1,
+                  0.125,0.3125,0.4375,0.0909,0.5,0.6625,0875,0.3636,
+                  0,0.2375,0.4375,0.2727,0.2625,0.7375,1,0.5455,
+                  0.125,0.25,0.375,0.1818,0.5625,0.7375,0.875,0.0909,
+                  0.1875,0.2375,0.3125,0,0.6875,0.7375,0.8125,0,
+                  0,0.175,0.375,0.1818,0.625,0.7625,1,0.0909,
+                  0.0625,0.2,0.375,0.2727,0.5625,0.7375,0.875,0.4545,
+                  0,0.125,0.25,0.0909,0.75,0.875,1,0.3636,
+                  0.1575,0.2125,0.3125,0,0.625,0.675,0.6875,0,
+                  0.125,0.3,0.4375,0,0.5625,0.725,0.875,0,
+                  0.375,0.4125,0.4375,0,0.5625,0.5875,0.625,1), 
+                nrow = 17, ncol = 8, byrow = TRUE)
+x <- cbind(c("Algeria", "Bahrain","Egypt",
+             "Iraq", "Jordan", "Kuwait",
+             "Lebanon","Libya","Morocco",
+             "Oman","Qatar","Saudi Arabia",
+             "Syria","Tunisia","United Arab Emirates",
+             "West Bank","Yemen"), stats)
+colnames(x) <- c("Country", rep(c("Min", "Average", "Max", ""), 2))
+
+Arab_first2 <- kable(x, align = "c", booktabs = T, caption = "\\label{tab:ArabSummary}Arab Region Average Alternate Futures' Performances",longtable = FALSE) %>%
+  add_header_above(c(" ", "FROT[note]" = 3, "PROT[note]" = 1, "FCL[note]" = 3, "PCL[note]" = 1)) %>%
+  add_footnote(c("Future average rate of transitions",
+                 "Past ten years rate of transitions",
+                 "Future conflict likelihood",
+                 "Past ten years conflict likelihood"),
+               notation = "symbol") %>%
+  kable_styling(font_size = 8, latex_options = "hold_position")
+
+second_stats <- matrix(c(0, 0.2, 1, 1, 
+                          1, 1, 1, 1,
+                         0.6667,0.8667,1,1,
+                         0,0.4667,1,1,
+                         0.6667,0.6667,0.6667,1,
+                         0.6667,0.9333,1,1,
+                         0.6667,0.9333,1,1,
+                         0.6667,0.8667,1,1,
+                         0.6667,0.7333,1,1,
+                         0.3333,0.6,0.6667,0,
+                         0.3333,0.6,0.6667,0,
+                         0,0.4,1,1,
+                         0,0.6,1,1,
+                         0.6667,0.8,1,1,
+                         0.3333,0.3333,0.3333,0,
+                         0.3333,0.7333,1,0,
+                         1,1,1,1
+                         ),
+                       nrow = 17, ncol = 4, byrow = TRUE)
+y <- cbind(c("Algeria", "Bahrain","Egypt",
+             "Iraq", "Jordan", "Kuwait",
+             "Lebanon","Libya","Morocco",
+             "Oman","Qatar","Saudi Arabia",
+             "Syria","Tunisia","United Arab Emirates",
+             "West Bank","Yemen"), second_stats)
+colnames(y) <- c("Country", "Min","Average","Max", "")
+
+Arab_recent <- kable(y, align = "c", format="latex", booktabs = T, caption = "\\label{tab:ArabSummaryrecent}Arab Region Average Alternate Futures' Recent Conflict Likelihoods") %>%
+  add_header_above(c(" ", "FRCL[note]" = 3, "PRCL[note]" = 1)) %>%
+  add_footnote(c("Most recent future three years conflict likelihood",
+                 "Most recent past three years conflict likelihood"),
+               notation = "symbol") %>%
+  kable_styling(bootstrap_options = "scale_down", latex_options = "hold_position")
+
+print(Arab_first2)
+print(Arab_recent)
+```
+
+```{r SEAsiaSummary, results='asis', eval=TRUE, fig.pos='H'}
+library(kableExtra)
+stats <- matrix(c(0.375,0.4792,0.5,0.1818,0.375,0.3958,0.4375,0.9091,
+                  0.25,0.3229,0.4375,0.0909,0.1875,0.2917,0.4375,0.0909,
+                  0.125,0.375,0.5,0.0909,0.0625,0.2813,0.5,0.1818,
+                  0.375,0.4896,0.6875,0.1818,0.3125,0.3958,0.4375,0.7273,
+                  0.3125,0.3854,0.4375,0.1818,0.3125,0.3542,0.375,0.9091,
+                  0.25,0.3125,0.375,01818,0.1875,0.2396,0.3125,0.1818,
+                  0.375,0.4896,0.5625,0,0.375,0.4375,0.5,0,
+                  0.375,0.4479,0.5,0,0.3125,0.3854,0.4375,1,
+                  0.4375,0.5104,0.625,0,0.3125,0.4271,0.5,0,
+                  0.0625,0.2604,0.5625,0.4545,0.0625,0.1667,0.375,0.6364,
+                  0.3125,0.3333,0.375,0.0909,0.1875,0.3021,0.375,0.3636,
+                  0.3125,0.5104,0.875,0.2727,0.1875,0.3958,0.5,0.2727,
+                  0.375,0.5104,0.9375,0,0.375,0.4375,0.5,0,
+                  0.375,0.4479,0.5,0,0.3125,0.3646,0.375,0,
+                  0.0625,0.3542,0.625,0,0.0625,0.2813,0.5,1,
+                  0.375,0.4271,0.4375,0.0909,0.3125,0.4063,0.4375,0.9091,
+                  0.4375,0.4896,0.5,0.0909,0.375,0.4063,0.4375,0.3636,
+                  0.5,0.6875,0.875,0,0.375,0.4688,0.5,1,
+                  0.25,0.375,0.5,0.1818,0.125,0.3021,0.5,0.0909,
+                  0.4375,0.4583,0.5625,0,0.25,0.3542,0.4375,0,
+                  0.4365,0.4792,0.5,0.1818,0.25,0.4271,0.5,0.0909,
+                  0.3125,0.4375,0.5,0.3636,0.1875,0.3333,0.5,0.8182,
+                  0.3125,0.3438,0.4375,0,0.1875,0.3021,0.4375,1,
+                  0.4375,0.4792,0.5,0.3636,0.3125,0.4063,0.5,0.3636,
+                  0,0.0936,0.25,0.1818,0,0.09375,0.25,0.0909,
+                  0.25,0.3646,0.5,0,0.25,0.3542,0.5,0,
+                  0.375,0.4063,0.5,0.2727,0.25,0.3646,0.4375,0.3636
+                  ), 
+                nrow = 28, ncol = 8, byrow = TRUE)
+x <- cbind(c("Bangladesh", "Bhutan","Brunei Darussalam",
+             "Cambodia", "China", "North Korea",
+             "Fiji","India","Indonesia",
+             "Kiribati","Laos","Malaysia",
+             "Maldives","Micronesia","Mongolia",
+             "Myanmar","Nepal", "Papua New Guinea",
+             "Philippines","Samoa","Singapore",
+             "Solomon Islands","Sri Lanka", "Thailand",
+             "Timor-Leste","Tonga","Vanuatu","Vietnam"), stats)
+colnames(x) <- c("Country", rep(c("Min", "Average", "Max", ""), 2))
+
+SE_Asia_summary_first2 <- kable(x, align = "c", booktabs = T, caption = "\\label{tab:SEAsiaSummary}SE Asia Region Average Alternate Futures' Performances") %>%
+  add_header_above(c(" ", "FROT[note]" = 3, "PROT[note]" = 1, "FCL[note]" = 3, "PCL[note]" = 1)) %>%
+  add_footnote(c("Future average rate of transitions",
+                 "Past ten years rate of transitions",
+                 "Future conflict likelihood",
+                 "Past ten years conflict likelihood"),
+               notation = "symbol") %>%
+  kable_styling(font_size = 8, latex_options = "hold_position") 
 
 
+second_stats <- matrix(c(0,0.2778,0.3333,1,
+                         0,0.0556,0.3333,0,
+                         0.3333,0.3889,0.6667,0.6667,
+                         0,0.1111,0.3333,1,
+                         0,0.1111,0.3333,1,
+                         0,0,0,0,
+                         0,0.3333,0.6667,0,
+                         0,0.1667,0.3333,1,
+                         0,0.1667,0.3333,1,
+                         0.3333,0.3889,0.6667,0,
+                         0,0.0556,0.3333,0.3333,
+                         0,0.0556,0.3333,1,
+                         0.3333,0.3889,0.6667,0.6667,
+                         0,0.1667,0.3333,0,
+                         0,0.1667,0.3333,0,
+                         0,0.2778,0.3333,1,
+                         0,0.0556,0.3333,0.6667,
+                         0,0.2778,0.3333,1,
+                         0.3333,0.3333,0.3333,1,
+                         0,0.2222,0.3333,0.3333,
+                         0.3333,0.3333,0.3333,0,
+                         0,0.3333,0.6667,0,
+                         0,0.1667,0.6667,0.6667,
+                         0,0.1111,0.3333,1,
+                         0.3333,0.3889,0.6667,0.3333,
+                         0,0,0,0,
+                         0,0.1111,0.6667,0,
+                         0,0.0556,0.3333,1
+                         ),
+                       nrow = 28, ncol = 4, byrow = TRUE)
+
+y <- cbind(c("Bangladesh", "Bhutan","Brunei Darussalam",
+             "Cambodia", "China", "North Korea",
+             "Fiji","India","Indonesia",
+             "Kiribati","Laos","Malaysia",
+             "Maldives","Micronesia","Mongolia",
+             "Myanmar","Nepal", "Papua New Guinea",
+             "Philippines","Samoa","Singapore",
+             "Solomon Islands","Sri Lanka", "Thailand",
+             "Timor-Leste","Tonga","Vanuatu","Vietnam"),second_stats)
+colnames(y) <- c("Country", "Min","Average","Max", "")
+
+SE_Asia_summary_recent <- kable(y, align = "c", "latex", booktabs = T, caption = "\\label{tab:SEAsiaSummarycont}SE Asia Region Average Alternate Futures' Recent Conflict Likelihoods") %>%
+  add_header_above(c(" ", "FRCL[note]" = 3, "PRCL[note]" = 1)) %>%
+  add_footnote(c("Most recent future three years conflict likelihood",
+                 "Most recent past three years conflict likelihood"),
+               notation = "symbol") %>%
+  kable_styling(font_size = 9)
+
+print(SE_Asia_summary_first2)
+print(SE_Asia_summary_recent)
+
+```
+
+```{r SEAsiaScenarios, results='asis', eval=TRUE}
+avg_pc_change <- matrix(c(92.5,-64.25,-100,168.13,-50.5,-86.67,168.13,-51.88,-73.33,
+                          353.75,312.5,33.33,408.75,26.67,326.25,505,86.67,
+                          367.5,78.75,-70,395,168.13,-50,615,147.5,-50,
+                          154.38,-45,-80,154.378,-34.69,66.67,168.13,-38.13,-66.67,
+                          92.5,-71.13,-80,140.63,-45,-66.67,175,-58.75,-66.67,
+                          99.36,78.75,13.33,188.75,175,33.33,120,202.5,66.67,
+                          51.25,45,46.67,45,47.5,40,53.75,46.25,40,
+                          47.5,-57.5,-80,48.75,-57.5,-66.67,50,-57.5,-66.67,
+                          45,-61.25,-93.33,48.75,-53.75,-66.67,50,-57.5,-66.67,
+                          47.5,47.5,53.33,47.5,50,46.67,50,48.75,46.67,
+                          -17.5,-31.25,40,10,-21.43,0,-20.25,-17.5,160,
+                          367.5,-17.5,-86.67,340,6.56,-80,491.25,10,-66.67,
+                          69.58,42.08,-30,51.25,65,-60,124.58,60.42,-50,
+                          48.75,42.5,40,48.75,45,40,57.5,42.5,46.67,
+                          46.25,47.5,60,51.25,43.75,20,42.5,50,73.33,
+                          41.25,-55,-53.33,45,-53.75,-66.67,43.75,-53.75,-66.67,
+                          422.5,-54.63,-60,422.5,-47.75,-40,505,-49.13,-30,
+                          381.25,10,-86.67,408.75,30.63,-66.67,450,10,-66.67,
+                          50,-57.5,-66.67,53.75,-51.25,-73.33,70,-48.75,-46.67,
+                          168.13,353.75,40,161.25,408.75,20,181.88,422.5,20,
+                          51.25,45,40,36.25,35,40,56.25,48.75,46.67,
+                          175,326.25,33.33,181.88,395,33.33,223.13,436.25,40,
+                          37.5,-57.22,-60,37.5,-41.94,-50,40.94,-45,-60,
+                          37.5,-71.25,-93.33,45,-51.25,-66.67,48.75,-60,-73.33,
+                          34.06,16.88,80,403*4,23.75,-20,37.5,34.06,40,
+                          126.88,312.5,53.33,161.25,395,13.33,243.75,436.25,66.67,
+                          50,38.75,33.33,51.25,43.75,33.33,50,48.75,33.33,
+                          32.92,-31.25,-80,69.58,27.19,-73.33,78.75,6.56,-66.67),
+                       nrow = 28, ncol = 9, byrow = TRUE)
+
+y <- cbind(c("Bangladesh", "Bhutan","Brunei Darussalam",
+             "Cambodia", "China", "North Korea",
+             "Fiji","India","Indonesia",
+             "Kiribati","Laos","Malaysia",
+             "Maldives","Micronesia","Mongolia",
+             "Myanmar","Nepal", "Papua New Guinea",
+             "Philippines","Samoa","Singapore",
+             "Solomon Islands","Sri Lanka", "Thailand",
+             "Timor-Leste","Tonga","Vanuatu","Vietnam"),avg_pc_change)
+colnames(y) <- c("Country","ROT","CL","Recent CL","ROT","CL","Recent CL","ROT","CL","Recent CL")
+
+kable(y, align = "c", "latex", booktabs = T, caption = "\\label{tab:SEAsiaScenarios}SE Asia Region Regiona Scenarios' Alternate Futures' Average Percentage Changes") %>%
+  add_header_above(c(" ", "Scenario 1[note]" = 3, "Scenario 2[note]" = 3,"Scenario 3[note]" = 3)) %>%
+  add_footnote(c("Peace in bordering nations scenario compared to past ten years of border conflicts",
+                 "Governments are all democracies scenario compared to past ten years of governing",
+                 "Decline in trade (% of GDP) compared to past ten years of trade"),
+               notation = "symbol") %>%
+  kable_styling(font_size = 7)
+
+```
 
 
 
