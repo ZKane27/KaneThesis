@@ -388,7 +388,7 @@ print(xtd2, comment = F, include.rownames=FALSE, scalebox = 0.8,
 
 ### Imputation Challenges
 
-A problem that acrose specifically with the Southeast Asia region is some variables are linearly related. When the MICE algorithm builds the regression equation to predict a missing value, a variable that is a linear combination of another will result in a singularity error that halts the MICE algorithm. To fix this, redundant variables must be excluded from the set of predictor variables used by MICE. The dependent variables can be identified by the last eigenvector of the covariance matrix of the data after performing listwise deletion `r citep(BIB[key="micecitation"])`. The variable mobile cell subscriptions was highly correlated ($>0.5$) with multiple variables. Mobile cell subscriptions had by far the smallest loading ($2.012761e-11$) on the on the last eigenvector of the covariance matrix. For these reasons Mobile Cell Subscriptions was imputed individually using the MICE algorithm using univariate imputation techniques, and when imputed separately, the singularity errors ceased to disrupt the MICE algorithm.  
+A problem that arose specifically within the Southeast Asia region is some variables are linearly related. When the MICE algorithm builds the regression equation to predict a missing value, a variable that is a linear combination of another will result in a singularity error that halts the MICE algorithm. To fix this, redundant variables must be excluded from the set of predictor variables used by MICE. The dependent variables can be identified by the last eigenvector of the covariance matrix of the data after performing listwise deletion `r citep(BIB[key="micecitation"])`. The variable mobile cell subscriptions was highly correlated ($>0.5$) with multiple variables. Mobile cell subscriptions had by far the smallest loading ($2.012761e-11$) on the on the last eigenvector of the covariance matrix. For these reasons Mobile Cell Subscriptions was imputed individually using the MICE algorithm using univariate imputation techniques, and when imputed separately, the singularity errors ceased to disrupt the MICE algorithm.  
 
 ## Individual Variable Regression Model Generation
 
@@ -482,7 +482,7 @@ print(conflict_transition_map, comment = F, include.rownames=FALSE, scalebox = 0
 
 ### Individual Variable Model Building Procedure
 
-Linear regression models were built for variables that were significant in Neumann's `r citep(BIB[key="neumann"])` logistic regression models that predict a country's conflict transition. Multiple linear regression models were build to statistically define each individual variable of interest by the predictor variables in a given region which is assumed to be approxiamted by a straight line `r citep(BIB[key="bowerman"])`. For multiple linear regression with _k_ variables, the regression equation takes the form `r citep(BIB[key="larose"])`:
+Linear regression models were built for variables that were significant in Neumann's `r citep(BIB[key="neumann"])` logistic regression models that predict a country's conflict transition. Multiple linear regression models were build to statistically define each individual variable of interest by the predictor variables in a given region which is assumed to be approximated by a straight line `r citep(BIB[key="bowerman"])`. For multiple linear regression with _k_ variables, the regression equation takes the form `r citep(BIB[key="larose"])`:
 \begin{gather}
 y=\beta_0+\beta_1x_1+\beta_2x_2+...+\beta_kx_k+\epsilon
 \end{gather}
@@ -683,12 +683,13 @@ orig_conflicts_plotted <- ggplot(data=orignal_conflict_summary, aes(x=Year, y=Co
    geom_line() +
    geom_point() +
    labs(y="Avearge Arab Conflicts") +
+   geom_vline(xintercept=2014, linetype="dotted") +
    ylim(0,16) 
    
 orig_conflicts_plotted + theme_classic()
 ```
 
-Historically (2004-2014), there was a large jump in average yearly conflicts around 2010 followed by a short couple year period of no trend. By year, there appears to be an initial dip in the average Arab conflicts once in the projected, future years, but as the data are projected further into the future average yearly conflicts are positively growing at a slightly decreasing rate. 
+Historical data on and to the left of the dashed line represents the region's observations from 2004 to 2014. Over those years there was a large jump in average yearly conflicts around 2010 followed by a short couple year period of no trend.  By year, there appears to be an initial dip in the average Arab conflicts once in the projected, future years, but as the data are projected further into the future average yearly conflicts are positively growing at a slightly decreasing rate. 
 
 The variable behavior that appeared to indicate a tendency for conflict was low fertility rate, low trade (\% of GDP), high mobile cell subscriptions, high population density, and high percent border conflict. These characteristics seemed common between the countries that experienced longer periods in conflict. Only one of the data driven model's five alternative futures predicted that Algeria, a country historically in a state of conflict for the past ten years would remain in conflict. The other four futures generally predicted that Algeria would transfer out of conflict right away (2015) for about three to four years and then return to a state of conflict. These trends are seen in Figure \@ref(plot:Algeria) where each repetition's HIIK conflict score from the past and future are plotted over the past and forecasted years. Four alternative futures experienced nonviolence in Algeria immediately
 
@@ -752,13 +753,14 @@ orignal_conflict_summary <- data.frame(Year=(2004:2030),
 orig_conflicts_plotted <- ggplot(data=orignal_conflict_summary, aes(x=Year, y=Conflicts), height = 100) +
    geom_line() +
    geom_point() +
-   labs(y="Avearge SE Asia Conflicts")+
+   labs(y="Avearge SE Asia Conflicts") +
+   geom_vline(xintercept=2014, linetype="dotted") +
    ylim(0,17) 
    
 orig_conflicts_plotted + theme_classic()
 ```
 
-The past ten years of conflicts in Southeast Asia averaged around twelve conflicts per year, but the first five years of projected, future ten years' average conflicts dropped to about ten average conflict instances. Despite the initial regional peace, the alternative futures once again saw conflicts rebound to a similar range. Although over ten years, the conflicts in Southeast Asia are forecasted to decline based of this model's results. the Southeast Asia's average yearly conflicts behave similarly to those in Arab region. There is a much greater relative decrease in conflict occurrences initially in Southeast Asia, but both region's average yearly conflicts decline initially followed by increase trends at slightly decreasing rates. 
+The past ten years of conflicts in Southeast Asia, on and to the left of the dashed line, averaged around twelve conflicts per year, but the first five years of projected, future ten years' average conflicts dropped to about ten average conflict instances. Despite the initial regional peace, the alternative futures once again saw conflicts rebound to a similar range. Although over ten years, the conflicts in Southeast Asia are forecasted to decline based of this model's results. the Southeast Asia's average yearly conflicts behave similarly to those in Arab region. There is a much greater relative decrease in conflict occurrences initially in Southeast Asia, but both region's average yearly conflicts decline initially followed by increase trends at slightly decreasing rates. 
 
 There weren't any recognizable variables' behaviors that were common to country's with futures of prolonged non violence. The region seemed to experience few sustained years of peace or hostilities. The variables, compared to the Arab region fluctuated more between the imposed operation limits as they were projected. This resulted in an 0.347 absolute change in the rate of transitions, meaning countries were changing conflict statuses relatively quicker over the course of the alternative futures. There were no replicated countries' alternative futures that experienced a likelihood of conflict greater than 0.5 which is a vast regional decrease from the Arab nations' likelihoods of being in conflict. Of all the replicated future alternatives, North Korea had the highest average and max rates of transitions as well as one of the highest average future conflict likelihood. North Korea stood out in the region and experienced average aboslute changes in all three of its individual alternative futures metrics. Figure \@{plot:northkorea} presents the HIIK conflict intensity scores of North Korea for each repetition against years. It's clear that North Korea, although being one of the countries to transition the fastest in Southeast Asia, it transitioned between the far extremes of the HIIK conflict intensity barometer multiple times in the all five repetitions. It trended towards the furthestmost environment of peace, HIIK conflict score of zero or extreme of war, HIIK conflict score of five. With the data driven model, nations in the Southeast Asia region underwent serious instability as nations' seemed more likely to be in either no conflict or war with few instances of intermediate HIIK conflict levels.  
 
@@ -843,7 +845,7 @@ Stepwise regression was the main technique used to develop parsimonious models f
 
 **Question 3: What insights, nations susceptible or impervious to conflict transitions are identified by the generated regional conflict future alternatives?**
 
-In the Arab region, the data alternative futures driven by the relationships defined by the data predicted an overall ten year increase in conflicts compared to the observed past ten years of data. On average the future alternatives subject to no regional scenarios predicted 134.2 conflicts to arise in the next ten years opposed to 98 instances of conflict observed across the Arab region's nations. Conflict in the region was overall predicted to rise, and Bahrain, Kuwait, Lebanon, and Tunisia were the four nations of the sixteen in the region that had highest regional likelihood of conflict. Kuwait, Oman, Qatar, United Arab Emirate, and West Bank were the countries with the least similar likelihoods of conflict compared to the nations' previous conflict activities. The only measure that the purely data driven future alternatives didn't predict would have a large average absolute change across the region was there was a small predicted average change (0.138) of the rates of transitions compared to the regional rates. The Arab region was transitioning at a similar rate in and out of conflict but there was a trend of increased nations' likelihoods of being in conflict as time past. 
+In the Arab region, the data alternative futures driven by the relationships defined by the data predicted an overall ten year increase in conflicts compared to the observed past ten years of data. On average the future alternatives subject to no regional scenarios predicted 134.2 conflicts to arise in the next ten years opposed to 98 instances of conflict observed across the Arab region's nations. Conflict in the region was overall predicted to rise, and Bahrain, Kuwait, Lebanon, and Tunisia were the four nations of the sixteen in the region that had highest regional likelihood of conflict. Kuwait, Oman, Qatar, United Arab Emirate, and West Bank were the countries with the least similar likelihoods of conflict compared to the nations' previous conflict activities. The only measure that the purely data driven future alternatives didn't predict would have a large average absolute change across the region was a smaller predicted average change (0.138) of the rates of transitions compared to the regional rates. The Arab region was transitioning at a similar rate in and out of conflict but there was a trend of increased nations' likelihoods of being in conflict as time past. 
 
 The Southeast Asia region experienced different conflict trends than the Arab region's general rise in instances of violent conflict. The alternative futures driven by unrestricted relationships of the variables of interest predicted that across all countries and repetitions there would be 131.4 conflicts in the next ten years. This is a downturn from the past ten years of observed data's 136 conflicts in the region. Along with having a regional long term average absolute change in conflict likelihood of 0.351, the model produced alternative futures' with short term conflict likelihoods even less than the historic likelihoods of conflict (0.417). The average absolute change of rates of transitions in the region rose (0.351) as well meaning nations are transitioning conflict statuses much more often than historically. Based on comparisons to the regional rates of transitions and long term conflict likelihood, North Korea scored the highest making it a concerning location for future escalating conflict. The region's conflicts driven by the novel imputation alternative futures approach appeared to decrease in total regional conflicts for the next ten years, and during the entirety of the forecast horizon, nations' conflicts behave differently than how they have in the past ten years.
 
@@ -861,9 +863,9 @@ In Issac Asimov's science fiction novel, _Foundations_, a new branch of mathemat
 
 As part of continuing research, this study recommends multiple areas for deeper analysis of alternative futures of country conflict. The first area for continuing this research is to expand the variables considered for each region. The scale of this entire project could be broadened to include all of the available data. This research only considered the variables identified as influential in the Neumann `r citep(BIB[key="neumann"])` model for two regions, but all of the variables available could be used to define and project the entire data set into the future. There is a greater chance of developing better fitting regression models when more explanatory variables are considered, and a variety of regressors could decrease the number of violated assumptions of linear regression. 
 
-In addition to expanding the variables considered to explain each region, an alternative model reduction technique could be applied to find the parsimonious models that make up a region. Stepwise regression was the foremost model reduction method used in this study, but there are alternate techniques that may produce different, simpler regional variable relationships. Lasso regression is one technique which could be explored to explain each region differently and project data into the future. Any improvements that can be made to the individual variables' linear regression models would produce more convincing projected data and alternative futures. 
+In addition to expanding the variables considered to explain each region, an alternative model reduction technique could be applied to find the parsimonious models that make up a region. Stepwise regression was the foremost model reduction method used in this study, but there are alternate techniques that may produce different, simpler regional variable relationships. Lasso regression is one technique which could be explored to explain each region differently and project data into the future. Any improvements that can be made to the individual variables' linear regression models would produce more convincing projected data and alternative futures. This research's imputed future alternatives generative method could still be developed upon in the same manner that univariate missing data imputation methods have been progressed. This research took an predicted point estimate plus noise approach to defining the yearly estimates of each variable, but Van Buuren `r citep(BIB[key="vanbuuren"])` identified two other univariate imputation methods that incorporate more uncertainty: Bayesian multiple imputation and bootstrap multiple imputation. Both of these methods take the prediction plus noise formulation one step further by adding on parameter uncertainty. Expanding the imputation theory behind the alternative futures may be a possible area of future research. Branching off from an imputation approach, future research could analyze an entirely different supervised learning method's ability to iteratively predict yearly point estimates. Neural Networks are a powerful supervised learning method that has been used to impute data and could provide am alternate way of projecting data. 
 
-This research's imputed future alternatives generative method could still be developed upon in the same manner that univariate missing data imputation methods have been progressed. This research took an predicted point estimate plus noise approach to defining the yearly estimates of each variable, but Van Buuren `r citep(BIB[key="vanbuuren"])` identified two other univariate imputation methods that incorporate more uncertainty: Bayesian multiple imputation and bootstrap multiple imputation. Both of these methods take the prediction plus noise formulation one step further by adding on parameter uncertainty. Expanding the imputation theory behind the alternative futures may be a possible area of future research. Branching off from an imputation approach, future research could analyze an entirely different supervised learning method's ability to iteratively predict yearly point estimates. Incorporating more uncertainty into the method or testing an alternate future generation technique would only enhance decision makers knowledge towards developing of strategic and operational plans. 
+Social Sciences have established theories that relate violent conflicts to predominant economic or political factors. This research could be vectored to explore the social sciences theories, and how the social sciences' beliefs on violent conflicts are supported or rejected by analytical techniques. Incorporating more uncertainty and information into the alternate future generation would only enhance decision makers knowledge towards developing of strategic and operational plans. 
 
 # Appendix A {-}
 
@@ -1100,44 +1102,6 @@ print(Arab_first2)
 print(Arab_recent)
 ```
 
-```{r ArabScenarios, results='asis', eval=TRUE, fig.pos='H'}
-avg_pc_change <- matrix(c(0,0,0,33.75,-40,-60,37.5,-46.25,-73.33,
-                          -100,83.33,0,10,65,0,-100,83.33,0,
-                          -100,37.5,0,-12.92,-2.03,-40,-54.17,13.44,-6.67,
-                          0,0,0,37.5,-38.75,-66.67,16.25,-25,-86.67,
-                          -100,83.33,0,0.83,35.21,-33.33,16.25,30.63,-33.33,
-                          -100,175,0,326.25,82.19,-13.33,285,65,-53.33,
-                          0,0,0,12.5,-13.75,0,41.25,-42.5,-26.67,
-                          -100,175,0,161.25,102.82,-6.67,-100,175,0,
-                          -100,83.33,0,-31.25,42.8,0,-72.5,69.58,-20,
-                          -79.38,-793.75,73.33,-31.25,903.75,93.33,106.25,573.75,80,
-                          2.5,93.75,86.67,35,65,86.67,30,68.75,86.67,
-                          -100,10,0,-3.75,-9.25,-13.33,-24.38,-5.13,-26.67,
-                          -100,120,0,-49.58,73.25,-60,0.83,37.5,-66.67,
-                          -100,175,0,92.5,120,-13.33,326.25,54.69,-46.67,
-                          3.75,87.5,60,22.5,71.25,26.67,22.5,76.25,93.33,
-                          0,100,100,27.5,72.5,53.33,20,76.25,33.33,
-                          0,0,0,26.25,-30,-13.33,0,0,0
-                          ),
-                       nrow = 17, ncol = 9, byrow = TRUE)
-
-y <- cbind(c("Algeria", "Bahrain","Egypt",
-             "Iraq", "Jordan", "Kuwait",
-             "Lebanon","Libya","Morocco",
-             "Oman","Qatar","Saudi Arabia",
-             "Syria","Tunisia","United Arab Emirates",
-             "West Bank","Yemen"),avg_pc_change)
-colnames(y) <- c("Country","ROT","CL","Recent CL","ROT","CL","Recent CL","ROT","CL","Recent CL")
-
-kable(y, align = "c", "latex", booktabs = T, caption = "\\label{tab:ArabScenarios}Arab Regional Scenarios' Alternate Futures' Average Percentage Changes") %>%
-  add_header_above(c(" ", "Scenario 1[note]" = 3, "Scenario 2[note]" = 3,"Scenario 3[note]" = 3)) %>%
-  add_footnote(c("Peace in bordering nations scenario compared to past ten years of border conflicts",
-                 "Governments are all democracies scenario compared to past ten years of governing",
-                 "Decline in trade (% of GDP) compared to past ten years of trade"),
-               notation = "symbol") %>%
-  kable_styling(latex_options = c("scale_down","hold_position"))
-```
-
 ```{r SEAsiaSummary, results='asis', eval=TRUE, fig.pos='H'}
 library(kableExtra)
 stats <- matrix(c(0.375,0.4792,0.5,0.1818,0.375,0.3958,0.4375,0.9091,
@@ -1187,9 +1151,12 @@ SE_Asia_summary_first2 <- kable(x, align = "c", booktabs = T, caption = "\\label
                  "Future conflict likelihood",
                  "Past ten years conflict likelihood"),
                notation = "symbol") %>%
-  kable_styling(font_size = 10,latex_options = "hold_position")
+  kable_styling(font_size = 10,latex_options = ("scale_down"))
 
+print(SE_Asia_summary_first2)
+```
 
+```{r SEAsiaSummary2, results='asis', eval=TRUE, fig.pos='H'}
 second_stats <- matrix(c(0,0.2778,0.3333,1,
                          0,0.0556,0.3333,0,
                          0.3333,0.3889,0.6667,0.6667,
@@ -1237,61 +1204,99 @@ SE_Asia_summary_recent <- kable(y, align = "c", "latex", booktabs = T, caption =
   add_footnote(c("Most recent future three years conflict likelihood",
                  "Most recent past three years conflict likelihood"),
                notation = "symbol") %>%
-  kable_styling(font_size = 10,latex_options = "hold_position")
+  kable_styling(font_size = 10)
 
-print(SE_Asia_summary_first2)
 print(SE_Asia_summary_recent)
 
 ```
 
-```{r SEAsiaScenarios, results='asis', eval=TRUE, fig.pos='H'}
-  avg_pc_change <- matrix(c(92.5,-64.25,-100,168.13,-50.5,-86.67,168.13,-51.88,-73.33,
-                            353.75,312.5,33.33,408.75,26.67,326.25,505,86.67,
-                            367.5,78.75,-70,395,168.13,-50,615,147.5,-50,
-                            154.38,-45,-80,154.378,-34.69,66.67,168.13,-38.13,-66.67,
-                            92.5,-71.13,-80,140.63,-45,-66.67,175,-58.75,-66.67,
-                            99.36,78.75,13.33,188.75,175,33.33,120,202.5,66.67,
-                            51.25,45,46.67,45,47.5,40,53.75,46.25,40,
-                            47.5,-57.5,-80,48.75,-57.5,-66.67,50,-57.5,-66.67,
-                            45,-61.25,-93.33,48.75,-53.75,-66.67,50,-57.5,-66.67,
-                            47.5,47.5,53.33,47.5,50,46.67,50,48.75,46.67,
-                            -17.5,-31.25,40,10,-21.43,0,-20.25,-17.5,160,
-                            367.5,-17.5,-86.67,340,6.56,-80,491.25,10,-66.67,
-                            69.58,42.08,-30,51.25,65,-60,124.58,60.42,-50,
-                            48.75,42.5,40,48.75,45,40,57.5,42.5,46.67,
-                            46.25,47.5,60,51.25,43.75,20,42.5,50,73.33,
-                            41.25,-55,-53.33,45,-53.75,-66.67,43.75,-53.75,-66.67,
-                            422.5,-54.63,-60,422.5,-47.75,-40,505,-49.13,-30,
-                            381.25,10,-86.67,408.75,30.63,-66.67,450,10,-66.67,
-                            50,-57.5,-66.67,53.75,-51.25,-73.33,70,-48.75,-46.67,
-                            168.13,353.75,40,161.25,408.75,20,181.88,422.5,20,
-                            51.25,45,40,36.25,35,40,56.25,48.75,46.67,
-                            175,326.25,33.33,181.88,395,33.33,223.13,436.25,40,
-                            37.5,-57.22,-60,37.5,-41.94,-50,40.94,-45,-60,
-                            37.5,-71.25,-93.33,45,-51.25,-66.67,48.75,-60,-73.33,
-                            34.06,16.88,80,403*4,23.75,-20,37.5,34.06,40,
-                            126.88,312.5,53.33,161.25,395,13.33,243.75,436.25,66.67,
-                            50,38.75,33.33,51.25,43.75,33.33,50,48.75,33.33,
-                            32.92,-31.25,-80,69.58,27.19,-73.33,78.75,6.56,-66.67),
-                         nrow = 28, ncol = 9, byrow = TRUE)
-  
-  y <- cbind(c("Bangladesh", "Bhutan","Brunei Darussalam",
-               "Cambodia", "China", "North Korea",
-               "Fiji","India","Indonesia",
-               "Kiribati","Laos","Malaysia",
-               "Maldives","Micronesia","Mongolia",
-               "Myanmar","Nepal", "Papua New Guinea",
-               "Philippines","Samoa","Singapore",
-               "Solomon Islands","Sri Lanka", "Thailand",
-               "Timor-Leste","Tonga","Vanuatu","Vietnam"),avg_pc_change)
-  colnames(y) <- c("Country","ROT","CL","Recent CL","ROT","CL","Recent CL","ROT","CL","Recent CL")
-  
-  kable(y, align = "c", "latex", booktabs = T, caption = "\\label{tab:SEAsiaScenarios}Southeast Asia Regional Scenarios' Alternate Futures' Average Percentage Changes") %>%
-    add_header_above(c(" ", "Scenario 1[note]" = 3, "Scenario 2[note]" = 3,"Scenario 3[note]" = 3)) %>%
-    add_footnote(c("Peace in bordering nations scenario compared to past ten years of border conflicts",
-                   "Governments are all democracies scenario compared to past ten years of governing",
-                   "Decline in trade (% of GDP) compared to past ten years of trade"),
-                 notation = "symbol") %>%
-    kable_styling(font_size = 9)
+```{r scear1Arabconficts, echo=FALSE, fig.cap="\\label{plot:Arabscen1Conflicts}Arab Region's Scenario 1 Alternative Futures' Avearge Yearly Conflicts", cache=TRUE, fig.width = 5, fig.height = 4, out.height="35%"}
+scen1_conflict_summary <- data.frame(Year=(2004:2030),
+                           Conflicts = c(5,	7,	6,	6,	5,	7,	9,	14,	13,	13,	13,
+                                         15.8,16,16.8,17,17,17,17,17,17,17,17,17,17,17,17,17))
+
+scen1_conflicts_plotted <- ggplot(data=scen1_conflict_summary, aes(x=Year, y=Conflicts), height = 100) +
+   geom_line() +
+   geom_point() +
+   labs(y="Avearge Arab Conflicts") +
+   geom_vline(xintercept=2014, linetype="dotted") +
+   ylim(0,17) 
+   
+scen1_conflicts_plotted + theme_classic()
+```
+
+```{r scear2Arabconficts, echo=FALSE, fig.cap="\\label{plot:Arabscen2Conflicts}Arab Region's Scenario 2 Alternative Futures' Avearge Yearly Conflicts", cache=TRUE, fig.width = 5, fig.height = 4, out.height="35%"}
+scen2_conflict_summary <- data.frame(Year=(2004:2030),
+                           Conflicts = c(5,	7,	6,	6,	5,	7,	9,	14,	13,	13,	13,
+                                         13.8,13.2,10.2,9.8,10.8,10.2,10.2,12.6,12.6,13.8,13.6,14,14.2,15.8,14.6,14))
+
+scen2_conflicts_plotted <- ggplot(data=scen2_conflict_summary, aes(x=Year, y=Conflicts), height = 100) +
+   geom_line() +
+   geom_point() +
+   labs(y="Avearge Arab Conflicts") +
+   geom_vline(xintercept=2014, linetype="dotted") +
+   ylim(0,17) 
+   
+scen2_conflicts_plotted + theme_classic()
+```
+
+```{r scear3Arabconficts, echo=FALSE, fig.cap="\\label{plot:Arabscen3Conflicts}Arab Region's Scenario 3 Alternative Futures' Avearge Yearly Conflicts", cache=TRUE, fig.width = 5, fig.height = 4, out.height="35%"}
+scen3_conflict_summary <- data.frame(Year=(2004:2030),
+                           Conflicts = c(5,	7,	6,	6,	5,	7,	9,	14,	13,	13,	13,
+                                         14.2,12,8.4,9.6,12.4,13.2,11.6,11.2,13.4,13.4,13,14.4,14.4,14.2,14.2,15.2))
+
+scen3_conflicts_plotted <- ggplot(data=scen3_conflict_summary, aes(x=Year, y=Conflicts), height = 100) +
+   geom_line() +
+   geom_point() +
+   labs(y="Avearge Arab Conflicts") +
+   geom_vline(xintercept=2014, linetype="dotted") +
+   ylim(0,17) 
+   
+scen3_conflicts_plotted + theme_classic()
+```
+
+```{r scenar1SEconficts, echo=FALSE, fig.cap="\\label{plot:SEAsiaConflictscenar1}Southeast Asia Region's Scenario 1 Alternative Futures' Avearged Yearly Conflicts", fig.width = 5, fig.height = 4, out.height="35%"}
+scenar1_conflict_summary <- data.frame(Year=(2004:2030),
+                           Conflicts = c(13,9,13,11,10,12,11,13,16,15,13,9.2,7,
+                                         10.2,11.2,10.6,8,12.8,9.8,11,10.8,12.6,11.6,12.4,10.2,12,13.2))
+
+orig_conflicts_plotted <- ggplot(data=scenar1_conflict_summary, aes(x=Year, y=Conflicts), height = 100) +
+   geom_line() +
+   geom_point() +
+   labs(y="Avearge SE Asia Conflicts") +
+   geom_vline(xintercept=2014, linetype="dotted") +
+   ylim(0,17) 
+   
+orig_conflicts_plotted + theme_classic()
+```
+
+```{r scenar2SEconficts, echo=FALSE, fig.cap="\\label{plot:SEAsiaConflictscenar2}Southeast Asia Region's Scenario 2 Alternative Futures' Avearged Yearly Conflicts", fig.width = 5, fig.height = 4, out.height="35%"}
+scenar2_conflict_summary <- data.frame(Year=(2004:2030),
+                           Conflicts = c(13,9,13,11,10,12,11,13,16,15,13,
+                                         7.8,2.6,17.4,14.8,11,8.4,16.8,17.4,12.6,9,16.6,18,11.8,10,16.2,17.8))
+
+scen2_conflicts_plotted <- ggplot(data=scenar2_conflict_summary, aes(x=Year, y=Conflicts), height = 100) +
+   geom_line() +
+   geom_point() +
+   labs(y="Avearge SE Asia Conflicts") +
+   geom_vline(xintercept=2014, linetype="dotted") +
+   ylim(0,18) 
+   
+scen2_conflicts_plotted + theme_classic()
+```
+
+```{r scenar3SEconficts, echo=FALSE, fig.cap="\\label{plot:SEAsiaConflictscenar3}Southeast Asia Region's Scenario 3 Alternative Futures' Avearged Yearly Conflicts", fig.width = 5, fig.height = 4, out.height="35%",eval=TRUE}
+scenar3_conflict_summary <- data.frame(Year=(2004:2030),
+                           Conflicts = c(13,9,13,11,10,12,11,13,16,15,13,
+                                         13.8,8.2,15.8,10.6,9.8,13.2,14.8,11,11.8,13.6,14,11.6,12.2,15,14.4,12))
+
+scen3_conflicts_plotted <- ggplot(data=scenar3_conflict_summary, aes(x=Year, y=Conflicts), height = 100) +
+   geom_line() +
+   geom_point() +
+   labs(y="Avearge SE Asia Conflicts") +
+   geom_vline(xintercept=2014, linetype="dotted") +
+   ylim(0,18) 
+   
+scen3_conflicts_plotted + theme_classic()
 ```
 
